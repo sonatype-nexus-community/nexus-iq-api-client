@@ -38,6 +38,8 @@ This repository produces generated API Clients in various languages and framewor
 
 ```
 docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli batch --clean /local/typescript.yaml
+
+docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli generate -i /local/spec/openapi.yaml -g typescript-fetch -o /local/out/test -c /local/openapi-config.yaml -v > out.log
 ```
 
 ## Changelog
