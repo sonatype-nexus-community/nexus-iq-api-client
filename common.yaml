@@ -1,0 +1,3 @@
+inputSpec: /local/spec/openapi.yaml
+gitUserId: sonatype-nexus-community
+gitRepoId: nexus-iq-api-client
