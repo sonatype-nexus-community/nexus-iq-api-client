@@ -1940,23 +1940,23 @@ paths:
             text/html:
               schema:
                 type: string
-  /api/v2/licenseLegalMetadata/customMultiApplication/report:
-    post:
-      tags:
-        - License Legal Metadata
-      operationId: getLicenseLegalCustomMultiApplicationHTMLReport
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/FormDataMultiPart'
-      responses:
-        default:
-          description: default response
-          content:
-            text/html:
-              schema:
-                type: string
+  # /api/v2/licenseLegalMetadata/customMultiApplication/report:
+  #   post:
+  #     tags:
+  #       - License Legal Metadata
+  #     operationId: getLicenseLegalCustomMultiApplicationHTMLReport
+  #     requestBody:
+  #       content:
+  #         multipart/form-data:
+  #           schema:
+  #             $ref: '#/components/schemas/FormDataMultiPart'
+  #     responses:
+  #       default:
+  #         description: default response
+  #         content:
+  #           text/html:
+  #             schema:
+  #               type: string
   /api/v2/licenseLegalMetadata/multiApplication/report/templateId/{templateId}:
     post:
       tags:
@@ -2601,33 +2601,33 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ApiPolicyWaiverDTO'
-  /api/v2/product/license:
-    post:
-      tags:
-        - Product
-      operationId: installLicense
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  $ref: '#/components/schemas/FormDataContentDisposition'
-      responses:
-        default:
-          description: default response
-          content:
-            text/plain: {}
-    delete:
-      tags:
-        - Product
-      operationId: uninstallLicense
-      responses:
-        default:
-          description: default response
-          content:
-            '*/*': {}
+  # /api/v2/product/license:
+  #   post:
+  #     tags:
+  #       - Product
+  #     operationId: installLicense
+  #     requestBody:
+  #       content:
+  #         multipart/form-data:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               file:
+  #                 $ref: '#/components/schemas/FormDataContentDisposition'
+  #     responses:
+  #       default:
+  #         description: default response
+  #         content:
+  #           text/plain: {}
+  #   delete:
+  #     tags:
+  #       - Product
+  #     operationId: uninstallLicense
+  #     responses:
+  #       default:
+  #         description: default response
+  #         content:
+  #           '*/*': {}
   /api/v2/config/httpProxyServer:
     get:
       tags:
@@ -3119,25 +3119,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiSamlConfigurationResponseDTO'
-    put:
-      tags:
-        - Config SAML
-      operationId: insertOrUpdateSamlConfiguration
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                identityProviderXml:
-                  type: string
-                samlConfiguration:
-                  $ref: '#/components/schemas/ApiSamlConfigurationDTO'
-      responses:
-        default:
-          description: default response
-          content:
-            '*/*': {}
+    # put:
+    #   tags:
+    #     - Config SAML
+    #   operationId: insertOrUpdateSamlConfiguration
+    #   requestBody:
+    #     content:
+    #       multipart/form-data:
+    #         schema:
+    #           type: object
+    #           properties:
+    #             identityProviderXml:
+    #               type: string
+    #             samlConfiguration:
+    #               $ref: '#/components/schemas/ApiSamlConfigurationDTO'
+    #   responses:
+    #     default:
+    #       description: default response
+    #       content:
+    #         '*/*': {}
     delete:
       tags:
         - Config SAML
