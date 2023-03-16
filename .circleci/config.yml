@@ -33,6 +33,16 @@ jobs:
           name: Build the Generated API Client
           working_directory: /tmp/workspace/typescript
           command: npm i && npm run build
+      - when:
+          condition:
+            equal:
+              - main
+              - << pipeline.git.branch >>
+          steps:
+            - run:
+                name: Publish to NPM
+                command: date
+            
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
