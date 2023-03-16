@@ -42,8 +42,10 @@ jobs:
           at: /tmp/workspace
       - run:
           name: Derive next version from Tag
-          command: echo -n "<< pipeline.git.tag >>" | cut -d 'v' -f2 > DERIVED_NEXT_VERSION
+          command: echo -n "<< pipeline.git.tag >>" | cut -d 'v' -f2 > /tmp/workspace/DERIVED_NEXT_VERSION
           working_directory: /tmp/workspace
+      - run: ls -al /tmp/workspace
+      - run: cat /tmp/workspace/DERIVED_NEXT_VERSION
 
   release-typescript:
     docker: 
