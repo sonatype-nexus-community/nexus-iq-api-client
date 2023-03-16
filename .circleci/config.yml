@@ -40,12 +40,14 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: |
-          export NEXT_VERSION=$(echo "<< pipeline.git.tag >>" | cut -d 'v' -f2)
-          if [[ "$(npm pkg get version)" == "$NEXT_VERSION" ]] echo "Already at Version ${NEXT_VERSION}." && echo 1;
+      - run: 
+          name: Determine Release Version
+          command: |
+            export NEXT_VERSION=$(echo "<< pipeline.git.tag >>" | cut -d 'v' -f2)
+            if [[ "$(npm pkg get version)" == "$NEXT_VERSION" ]] echo "Already at Version ${NEXT_VERSION}." && echo 1;
       - run:
           name: Set Release Version
-          command: npm version << parameters.version >>
+          command: npm version $NEXT_VERSION
       # - run:
       #     name: Build & Publish the API Client to NPM
       #     working_directory: /tmp/workspace/typescript
