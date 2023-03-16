@@ -33,15 +33,24 @@ jobs:
           name: Build the Generated API Client
           working_directory: /tmp/workspace/typescript
           command: npm i && npm run build
-      - when:
-          condition:
-            equal:
-              - main
-              - << pipeline.git.branch >>
-          steps:
-            - run:
-                name: Publish to NPM
-                command: date
+
+  release-typescript:
+    docker: 
+      - image: cimg/node:18.14
+    parameters:
+      library:
+        version: string
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls -al /tmp/workspace
+      - run:
+          name: Set Release Version
+          command: npm version << parameters.version >>
+      # - run:
+      #     name: Build & Publish the API Client to NPM
+      #     working_directory: /tmp/workspace/typescript
+      #     command: npm publish
             
 
 # Invoke jobs via workflows
@@ -56,3 +65,20 @@ workflows:
       - validate-typescript:
           requires:
             - generate-library
+  release-all:
+    jobs:
+      - generate-library:
+          matrix:
+            parameters:
+              library: [csharp, typescript]
+      - validate-typescript:
+          requires:
+            - generate-library
+      - release-typescript:
+          context:
+            - auditjs
+          filters:
+            branches:
+              only: main
+          requires:
+            - validate-typescript
