@@ -6,7 +6,6 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   generate-libraries:
-    working_directory: /local
     docker:
       - image: cimg/openjdk:19.0.2
     steps:
@@ -37,4 +36,4 @@ workflows:
   build-all:
     jobs:
       - generate-libraries
-      - build-typescript
+      # - build-typescript
