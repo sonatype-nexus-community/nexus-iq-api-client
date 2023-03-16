@@ -46,6 +46,10 @@ jobs:
           working_directory: /tmp/workspace
       - run: ls -al /tmp/workspace
       - run: cat /tmp/workspace/DERIVED_NEXT_VERSION
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - DERIVED_NEXT_VERSION
 
   release-typescript:
     docker: 
