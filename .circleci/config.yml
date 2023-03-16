@@ -53,7 +53,9 @@ jobs:
           at: /tmp/workspace
       - run: 
           name: Version Check
-          command: CURRENT_VERSION=$(npm pkg get version | tr -d '"'); if [[ "$CURRENT_VERSION" == "$(cat DERIVED_NEXT_VERSION)" ]] then echo "Already at Version $(cat DERIVED_NEXT_VERSION)." && exit 1; fi
+          command: |
+            CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+            if [[ "$CURRENT_VERSION" == "$(cat DERIVED_NEXT_VERSION)" ]] then echo "Already at Version $(cat DERIVED_NEXT_VERSION)." && exit 1; fi
           working_directory: /tmp/workspace
       - run:
           name: Set Release Version
