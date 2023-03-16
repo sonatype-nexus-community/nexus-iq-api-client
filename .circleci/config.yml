@@ -69,10 +69,16 @@ workflows:
   release-all:
     jobs:
       - generate-library:
+          filters:
+            tags:
+              only: /^v.*/
           matrix:
             parameters:
               library: [csharp, typescript]
       - validate-typescript:
+          filters:
+            tags:
+              only: /^v.*/
           requires:
             - generate-library
       - release-typescript:
@@ -81,7 +87,5 @@ workflows:
           filters:
             tags:
               only: /^v.*/
-            branches:
-              ignore: /.*/
           requires:
             - validate-typescript
