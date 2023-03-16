@@ -10,10 +10,10 @@ jobs:
       - image: cimg/node:18.14
     steps:
       - checkout
-      - generate:
+      - run:
           name: Generate API Client in Typescript
           command: npx @openapitools/openapi-generator-cli batch --clean typescript.yaml
-      - validate_client:
+      - run:
           name: Build the Generated API Client
           working_directory: out/typescript
           command: npm build
