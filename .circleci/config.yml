@@ -68,7 +68,7 @@ jobs:
       - run:
           name: Build & Publish the API Client to NPM
           working_directory: /tmp/workspace/typescript
-          command: npm publish
+          command: npm i && npm publish
             
 
 # Invoke jobs via workflows
