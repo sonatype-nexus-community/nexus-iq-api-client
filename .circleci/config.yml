@@ -31,7 +31,7 @@ jobs:
       - run: ls -al /tmp/workspace
       - run:
           name: Build the Generated API Client
-          working_directory: /tmp/workspace/out/typescript
+          working_directory: /tmp/workspace/typescript
           command: npm build
 
 # Invoke jobs via workflows
