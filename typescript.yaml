@@ -3,6 +3,6 @@ outputDir: /local/out/typescript
 generatorName: typescript-fetch
 additionalProperties:
   npmName: "@sonatype/nexus-iq-api-client"
-  npmVersion: 1.156.0
+  npmVersion: 0.156.0
   supportsES6: true
   withInterfaces: true
