@@ -61,10 +61,6 @@ jobs:
             CURRENT_VERSION=$(npm pkg get version | tr -d '"')
             if [[ "$CURRENT_VERSION" == "$(cat /tmp/workspace/DERIVED_NEXT_VERSION)" ]] ; then echo "Already at Version $(cat /tmp/workspace/DERIVED_NEXT_VERSION)." && exit 1; fi
           working_directory: /tmp/workspace/typescript
-      - run: 
-          name: Authenticate with NPM
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-          working_directory: /tmp/workspace/typescript
       - run:
           name: Set Release Version
           command: npm version $(cat /tmp/workspace/DERIVED_NEXT_VERSION)
@@ -72,7 +68,10 @@ jobs:
       - run:
           name: Build & Publish the API Client to NPM
           working_directory: /tmp/workspace/typescript
-          command: npm i && npm publish
+          command: |
+            npm i 
+            npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+            npm publish --access public
             
 
 # Invoke jobs via workflows
