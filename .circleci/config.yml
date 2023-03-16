@@ -5,6 +5,19 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
+  generate-libraries:
+    working_directory: /local
+    docker:
+      - image: cimg/openjdk:19.0.2
+    steps:
+      - checkout
+      - run:
+          name: Install OpenAPI Generator CLI
+          command: wget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.3.0/openapi-generator-cli-6.3.0.jar -O openapi-generator-cli.jar
+      - run:
+          name: Generate API Client(s)
+          command: java -ea -Xms512M -Xmx1024M -server -jar openapi-generator-cli.jar batch --clean typescript.yaml
+
   build-typescript:
     docker: 
       - image: cimg/node:18.14
@@ -23,4 +36,5 @@ jobs:
 workflows:
   build-all:
     jobs:
+      - generate-libraries
       - build-typescript
