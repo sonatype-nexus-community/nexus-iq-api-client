@@ -82,7 +82,7 @@ workflows:
       - generate-library:
           matrix:
             parameters:
-              library: [csharp, typescript]
+              library: [csharp, python, typescript]
       - validate-typescript:
           requires:
             - generate-library
@@ -96,7 +96,7 @@ workflows:
               ignore: /.*/
           matrix:
             parameters:
-              library: [csharp, typescript]
+              library: [python, typescript]
       - validate-typescript:
           filters:
             tags:

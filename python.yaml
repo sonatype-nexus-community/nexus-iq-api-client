@@ -1,0 +1,7 @@
+'!include': 'common.yaml'
+outputDir: /local/out/python
+generatorName: python
+additionalProperties:
+  packageName: "nexus_iq_api_client"
+  packageVersion: "0.0.0"
+  projectName: "Sonatype Nexus IQ API Client"
