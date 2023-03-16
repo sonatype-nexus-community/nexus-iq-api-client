@@ -37,13 +37,12 @@ jobs:
   release-typescript:
     docker: 
       - image: cimg/node:18.14
-    parameters:
-      library:
-        version: string
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: ls -al /tmp/workspace
+      - run: |
+          export NEXT_VERSION=$(echo "<< pipeline.git.tag >>" | cut -d 'v' -f2)
+          if [[ "$(npm pkg get version)" == "$NEXT_VERSION" ]] echo "Already at Version ${NEXT_VERSION}." && echo 1;
       - run:
           name: Set Release Version
           command: npm version << parameters.version >>
@@ -79,6 +78,6 @@ workflows:
             - auditjs
           filters:
             branches:
-              only: main
+              only: /tags\/v.*/
           requires:
             - validate-typescript
