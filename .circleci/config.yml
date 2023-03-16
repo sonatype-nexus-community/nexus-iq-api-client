@@ -79,7 +79,9 @@ workflows:
           context:
             - auditjs
           filters:
+            tags:
+              only: /^v.*/
             branches:
-              only: /tags\/v.*/
+              ignore: /.*/
           requires:
             - validate-typescript
