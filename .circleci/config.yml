@@ -55,7 +55,7 @@ jobs:
           name: Version Check
           command: |
             CURRENT_VERSION=$(npm pkg get version | tr -d '"')
-            if [[ "$CURRENT_VERSION" == "$(cat /tmp/workspace/DERIVED_NEXT_VERSION)" ]] then echo "Already at Version $(cat /tmp/workspace/DERIVED_NEXT_VERSION)." && exit 1; fi
+            if [[ "$CURRENT_VERSION" == "$(cat /tmp/workspace/DERIVED_NEXT_VERSION)" ]] ; then echo "Already at Version $(cat /tmp/workspace/DERIVED_NEXT_VERSION)." && exit 1; fi
           working_directory: /tmp/workspace/typescript
       - run:
           name: Set Release Version
