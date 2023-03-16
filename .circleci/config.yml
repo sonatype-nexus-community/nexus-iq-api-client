@@ -19,7 +19,7 @@ jobs:
       - run:
           name: Generate API Client(s)
           command: |
-            docker run --rm -v "$CIRCLE_WORKING_DIRECTORY:/local" openapitools/openapi-generator-cli batch --clean /local/typescript.yaml
+            docker run --rm -v "$CIRCLE_WORKING_DIRECTORY:/local" openapitools/openapi-generator-cli batch --clean /local/*.yaml
 
   build-typescript:
     docker: 
