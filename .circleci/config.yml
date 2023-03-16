@@ -34,6 +34,17 @@ jobs:
           working_directory: /tmp/workspace/typescript
           command: npm i && npm run build
 
+  determine-release-version:
+    machine:
+      image: ubuntu-2204:2022.04.2
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Derive next version from Tag
+          command: echo -n "<< pipeline.git.tag >>" | cut -d 'v' -f2 > DERIVED_NEXT_VERSION
+          working_directory: /tmp/workspace
+
   release-typescript:
     docker: 
       - image: cimg/node:18.14
@@ -41,13 +52,12 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: 
-          name: Determine Release Version
-          command: |
-            export NEXT_VERSION=$(echo "<< pipeline.git.tag >>" | cut -d 'v' -f2)
-            if [[ "$(npm pkg get version)" == "$NEXT_VERSION" ]] echo "Already at Version ${NEXT_VERSION}." && echo 1;
+          name: Version Check
+          command: if [[ "$(npm pkg get version)" == "$(cat DERIVED_NEXT_VERSION)" ]] echo "Already at Version $(cat DERIVED_NEXT_VERSION)." && echo 1;
+          working_directory: /tmp/workspace
       - run:
           name: Set Release Version
-          command: npm version $NEXT_VERSION
+          command: npm version $(cat DERIVED_NEXT_VERSION)
       # - run:
       #     name: Build & Publish the API Client to NPM
       #     working_directory: /tmp/workspace/typescript
@@ -85,6 +95,14 @@ workflows:
               ignore: /.*/
           requires:
             - generate-library
+      - determine-release-version:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - validate-typescript
       - release-typescript:
           context:
             - auditjs
@@ -94,4 +112,4 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - validate-typescript
+            - determine-release-version
