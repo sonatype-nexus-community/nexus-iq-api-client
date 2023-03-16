@@ -34,6 +34,36 @@ This repository produces generated API Clients in various languages and framewor
 | -------------------- | ---------------------- | ------------------- |
 | Typescript (fetch)   | 156 | [NPM](https://www.npmjs.com/package/@sonatype/nexus-iq-api-client) |
 
+## Known Issues
+
+### APIs Excluded from Generation
+
+The following API endpoints are removed from the schema prior to generation of the API Client libraries.
+
+| API Endpoint | Method | Reason |
+| ------------ | ------ | ------ |
+| /api/v2/licenseLegalMetadata/customMultiApplication/report | POST | Relies on a schema of undefined `object` - generated code is invalid in Typescript. |
+| /api/v2/product/license | POST | Relies on a schema of undefined `object` - generated code is invalid in Typescript. |
+| /api/v2/product/license | DELETE | Relies on a schema of undefined `object` - generated code is invalid in Typescript. |
+| /api/v2/config/saml | PUT | Relies on a schema of undefined `object` - generated code is invalid in Typescript. |
+
+### Additional Changes to OpenAPI Schema prior to Generation
+
+1. Authentication is not defined - add the YAML block under `components`:
+   ```
+   ...
+      securitySchemes:
+        BasicAuth:
+            type: http
+            scheme: basic
+   ...
+   ```
+
+
+## Getting the latest OpenAPI Schema
+
+Get it from your Sonatype IQ Server at `/api/v2/endpoints/public`.
+
 ## Generation of API Clients
 
 ```
