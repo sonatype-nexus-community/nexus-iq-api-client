@@ -44,8 +44,6 @@ jobs:
           name: Derive next version from Tag
           command: echo -n "<< pipeline.git.tag >>" | cut -d 'v' -f2 > /tmp/workspace/DERIVED_NEXT_VERSION
           working_directory: /tmp/workspace
-      - run: ls -al /tmp/workspace
-      - run: cat /tmp/workspace/DERIVED_NEXT_VERSION
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
@@ -57,8 +55,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: ls -al /tmp/workspace
-      - run: cat /tmp/workspace/DERIVED_NEXT_VERSION
       - run: 
           name: Version Check
           command: |
@@ -69,10 +65,10 @@ jobs:
           name: Set Release Version
           command: npm version $(cat /tmp/workspace/DERIVED_NEXT_VERSION)
           working_directory: /tmp/workspace/typescript
-      # - run:
-      #     name: Build & Publish the API Client to NPM
-      #     working_directory: /tmp/workspace/typescript
-      #     command: npm publish
+      - run:
+          name: Build & Publish the API Client to NPM
+          working_directory: /tmp/workspace/typescript
+          command: npm publish
             
 
 # Invoke jobs via workflows
