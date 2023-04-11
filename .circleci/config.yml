@@ -22,18 +22,6 @@ jobs:
           paths:
             - "<< parameters.library >>"
 
-  validate-typescript:
-    docker: 
-      - image: cimg/node:18.14
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run: ls -al /tmp/workspace
-      - run:
-          name: Build the Generated API Client
-          working_directory: /tmp/workspace/typescript
-          command: npm i && npm run build
-
   validate-csharp:
     machine:
       image: 'windows-server-2022-gui:current'
@@ -46,7 +34,19 @@ jobs:
       - run:
           name: Build the Generated API Client
           working_directory: /tmp/workspace/csharp
-          command: 
+          command: msbuild
+
+  validate-typescript:
+    docker: 
+      - image: cimg/node:18.14
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls -al /tmp/workspace
+      - run:
+          name: Build the Generated API Client
+          working_directory: /tmp/workspace/typescript
+          command: npm i && npm run build  
 
   determine-release-version:
     machine:
