@@ -29,14 +29,16 @@ jobs:
       shell: powershell.exe -ExecutionPolicy Bypass
     steps:
       - attach_workspace:
-          at: /tmp/workspace
+          at: C:\Users\circleci\workspace
       - run: 
-          working_directory: /tmp/workspace/csharp
-          command: ls -Path /tmp/workspace/csharp
+          working_directory: C:\Users\circleci\workspace\csharp
+          command: ls -Path C:\Users\circleci\workspace\csharp
       - run:
           name: Build the Generated API Client
-          working_directory: /tmp/workspace/csharp
-          command: dotnet build
+          working_directory: C:\Users\circleci\workspace\csharp
+          command: |
+            cd 
+            dotnet build
 
   validate-typescript:
     docker: 
