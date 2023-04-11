@@ -30,7 +30,9 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: ls -al /tmp/workspace
+      - run: 
+          working_directory: /tmp/workspace
+          command: dir
       - run:
           name: Build the Generated API Client
           working_directory: /tmp/workspace/csharp
