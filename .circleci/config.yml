@@ -39,6 +39,17 @@ jobs:
           command: |
             cd 
             dotnet build
+      - run: 
+          working_directory: C:\Users\circleci\workspace\csharp
+          command: ls -Path C:\Users\circleci\workspace\csharp
+      - run:
+          name: Test Package & Release
+          working_directory: C:\Users\circleci\workspace\csharp
+          command: |
+            dotnet pack -c Release
+      - run: 
+          working_directory: C:\Users\circleci\workspace\csharp
+          command: ls -Path C:\Users\circleci\workspace\csharp
 
   validate-typescript:
     docker: 
