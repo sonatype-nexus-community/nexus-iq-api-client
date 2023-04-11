@@ -100,7 +100,7 @@ workflows:
       - generate-library:
           matrix:
             parameters:
-              library: [csharp, python, typescript]
+              library: [csharp, typescript]
       - validate-csharp:
           requires:
             - generate-library

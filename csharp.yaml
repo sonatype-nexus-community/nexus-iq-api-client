@@ -5,5 +5,5 @@ additionalProperties:
   packageGuid: "E4C002EE-63CE-4621-A020-E12DAEC5779A"
   packageName: Sonatype.Nexus.Iq.Api
   projectName: "Sonatype Nexus IQ API Client"
-  netCoreProjectFile: true 
+  netCoreProjectFile: false 
   targetFramework: "v4.5.2"
