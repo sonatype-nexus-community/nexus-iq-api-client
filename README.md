@@ -32,6 +32,7 @@ This repository produces generated API Clients in various languages and framewor
 
 | Language / Framework | Nexus IQ Version Added | Public Package Link |
 | -------------------- | ---------------------- | ------------------- |
+| C# / Dotnet | 156 | NuGet - coming soon... |
 | Typescript (fetch)   | 156 | [NPM](https://www.npmjs.com/package/@sonatype/nexus-iq-api-client) |
 
 ## Known Issues

@@ -2,7 +2,7 @@
 outputDir: /local/out/csharp
 generatorName: csharp
 additionalProperties:
-  packageGuid: "fc522ab0-35c5-4e5d-aab9-96101923667f"
+  packageGuid: "E4C002EE-63CE-4621-A020-E12DAEC5779A"
   packageName: Sonatype.Nexus.Iq.Api
   projectName: "Sonatype Nexus IQ API Client"
   netCoreProjectFile: true 

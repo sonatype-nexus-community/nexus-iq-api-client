@@ -34,6 +34,20 @@ jobs:
           working_directory: /tmp/workspace/typescript
           command: npm i && npm run build
 
+  validate-csharp:
+    machine:
+      image: 'windows-server-2022-gui:current'
+      resource_class: windows.medium
+      shell: powershell.exe -ExecutionPolicy Bypass
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls -al /tmp/workspace
+      - run:
+          name: Build the Generated API Client
+          working_directory: /tmp/workspace/csharp
+          command: 
+
   determine-release-version:
     machine:
       image: ubuntu-2204:2022.04.2
@@ -96,7 +110,15 @@ workflows:
               ignore: /.*/
           matrix:
             parameters:
-              library: [python, typescript]
+              library: [csharp, typescript]
+      - validate-csharp:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - generate-library
       - validate-typescript:
           filters:
             tags:
