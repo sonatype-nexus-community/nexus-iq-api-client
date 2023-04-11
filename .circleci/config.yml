@@ -31,12 +31,12 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: 
-          working_directory: /tmp/workspace
-          command: dir
+          working_directory: /tmp/workspace/csharp
+          command: ls -Path /tmp/workspace/csharp
       - run:
           name: Build the Generated API Client
           working_directory: /tmp/workspace/csharp
-          command: msbuild
+          command: dotnet build
 
   validate-typescript:
     docker: 
