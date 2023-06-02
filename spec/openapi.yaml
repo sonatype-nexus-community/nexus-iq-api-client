@@ -718,7 +718,11 @@ paths:
         default:
           description: default response
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiApplicationDTO'
     post:
       tags:
         - Applications
