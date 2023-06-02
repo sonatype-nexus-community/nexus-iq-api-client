@@ -58,6 +58,14 @@ The following API endpoints are removed from the schema prior to generation of t
             scheme: basic
    ...
    ```
+2. Response Schema added to `getApplications`:
+   ```
+        application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiApplicationDTO'
+   ```
 
 
 ## Getting the latest OpenAPI Schema
