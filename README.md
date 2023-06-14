@@ -69,9 +69,12 @@ The following API endpoints are removed from the schema prior to generation of t
    ```
         application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ApiApplicationDTO'
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiApplicationDTO'
    ```
 
 

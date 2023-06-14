@@ -720,9 +720,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ApiApplicationDTO'
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiApplicationDTO'
     post:
       tags:
         - Applications
