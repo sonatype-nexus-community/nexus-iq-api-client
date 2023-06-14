@@ -6967,3 +6967,5 @@ components:
           type: boolean
         allowOverride:
           type: boolean
+security:
+  - BasicAuth: []

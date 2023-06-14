@@ -58,6 +58,13 @@ The following API endpoints are removed from the schema prior to generation of t
             scheme: basic
    ...
    ```
+  And add the root `security` block to the end of the schema file:
+  ```
+  ...
+  security:
+    - BasicAuth: []
+  ```
+
 2. Response Schema added to `getApplications`:
    ```
         application/json:
