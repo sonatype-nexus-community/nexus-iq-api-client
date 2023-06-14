@@ -1,9 +1,9 @@
 '!include': 'common.yaml'
 outputDir: /local/out/csharp
-generatorName: csharp
+generatorName: csharp-netcore
 additionalProperties:
   packageGuid: "fc522ab0-35c5-4e5d-aab9-96101923667f"
   packageName: Sonatype.Nexus.Iq.Api
   projectName: "Sonatype Nexus IQ API Client"
   netCoreProjectFile: true 
-  targetFramework: "v4.5.2"
+  targetFramework: "net48"
