@@ -1,6 +1,6 @@
 '!include': 'common.yaml'
 outputDir: /local/out/csharp
-generatorName: csharp-netcore
+generatorName: csharp
 additionalProperties:
   packageGuid: "fc522ab0-35c5-4e5d-aab9-96101923667f"
   packageName: Sonatype.Nexus.Iq.Api
