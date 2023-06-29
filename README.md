@@ -77,6 +77,11 @@ The following API endpoints are removed from the schema prior to generation of t
                       $ref: '#/components/schemas/ApiApplicationDTO'
    ```
 
+3. Schema for `ApiComponentDetailsDTOV2` does not define the following properties as `nullable` when they should be:
+  - `relativePopularity`
+  - `integrityRating`
+  - `hygieneRating`
+
 
 ## Getting the latest OpenAPI Schema
 

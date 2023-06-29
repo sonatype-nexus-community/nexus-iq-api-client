@@ -4395,6 +4395,7 @@ components:
           $ref: '#/components/schemas/ApiLicenseDataDTO'
         integrityRating:
           type: string
+          nullable: true
         hygieneRating:
           type: string
           nullable: true
