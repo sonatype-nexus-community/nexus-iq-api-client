@@ -4390,12 +4390,14 @@ components:
         relativePopularity:
           type: integer
           format: int32
+          nullable: true
         licenseData:
           $ref: '#/components/schemas/ApiLicenseDataDTO'
         integrityRating:
           type: string
         hygieneRating:
           type: string
+          nullable: true
         securityData:
           $ref: '#/components/schemas/ApiSecurityDataDTO'
         policyData:
