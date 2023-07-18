@@ -43,10 +43,15 @@ jobs:
             git config user.name "CircleCI Job"
       - run:
           name: Commit generated code to GitHub
+          working_directory: /tmp/workspace/go
           command: |
-            git add out/go
+            git add ./*
             git commit --allow-empty -am "Update generated Go Client [skip ci]"
             git push origin master
+      - run:
+          name: Test Go API Client
+          working_directory: /tmp/workspace/go
+          command: go test -v ./
 
   validate-typescript:
     docker: 
