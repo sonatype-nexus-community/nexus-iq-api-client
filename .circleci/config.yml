@@ -75,9 +75,9 @@ jobs:
           name: Prep GitHub
           working_directory: /tmp/workspace/go
           command: |
+            git init .
             git config user.email "<community-group@sonatype.com>"
             git config user.name "CircleCI Job"
-            git init .
             git remote add git@github.com:sonatype-nexus-community/nexus-iq-api-client-go.git
             git checkout main
             git add ./*
