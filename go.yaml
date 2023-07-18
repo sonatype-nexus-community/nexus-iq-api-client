@@ -1,0 +1,7 @@
+'!include': 'common.yaml'
+outputDir: /local/out/go
+generatorName: go
+additionalProperties:
+  goImportAlias: iqclient
+  isGoSubmodule: true
+  packageName: goclient

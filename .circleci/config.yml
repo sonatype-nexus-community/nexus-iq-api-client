@@ -22,6 +22,18 @@ jobs:
           paths:
             - "<< parameters.library >>"
 
+  validate-go:
+    docker: 
+      - image: cimg/go:1.20.6
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls -al /tmp/workspace
+      - run:
+          name: Build the Generated API Client
+          working_directory: /tmp/workspace/go
+          command: go build -v ./
+
   validate-typescript:
     docker: 
       - image: cimg/node:18.14
@@ -82,7 +94,10 @@ workflows:
       - generate-library:
           matrix:
             parameters:
-              library: [csharp, typescript]
+              library: [csharp, go, typescript]
+      - validate-go:
+          requires:
+            - generate-library
       - validate-typescript:
           requires:
             - generate-library
