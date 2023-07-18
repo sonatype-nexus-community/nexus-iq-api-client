@@ -34,6 +34,7 @@ projects.
 
 | Language / Framework | Sonatype IQ Version Added | Public Package Link                                                                                                                   |
 |----------------------|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| Golang / Go | 164 | [![go.dev reference](https://img.shields.io/badge/dynamic/json?color=blue&label=tag&query=name&url=https://api.razonyang.com/v1/github/tag/sonatype-nexus-community/nexus-iq-api-client-go)](https://pkg.go.dev/github.com/sonatype-nexus-community/nexus-iq-api-client-go) |
 | Typescript (fetch)   | 156                       | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fnexus-iq-api-client)](https://www.npmjs.com/package/@sonatype/nexus-iq-api-client) |
 
 ## Known Issues
