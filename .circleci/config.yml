@@ -22,38 +22,6 @@ jobs:
           paths:
             - "<< parameters.library >>"
 
-  validate-go:
-    docker: 
-      - image: cimg/go:1.20.6
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - run: ls -al /tmp/workspace
-      - run:
-          name: Build the Generated API Client
-          working_directory: /tmp/workspace/go
-          command: go mod download && go mod verify && go mod tidy && go build -v ./
-      - add_ssh_keys:
-          fingerprints:
-            - "99:07:ca:a7:90:f1:29:1a:9a:a7:63:7b:d8:8c:02:e1"
-      - run:
-          name: Prep GitHub
-          working_directory: /tmp/workspace/go
-          command: |
-            git config user.email "<community-group@sonatype.com>"
-            git config user.name "CircleCI Job"
-      - run:
-          name: Commit generated code to GitHub
-          working_directory: /tmp/workspace/go
-          command: |
-            git add ./*
-            git commit --allow-empty -am "Update generated Go Client [skip ci]"
-            git push origin master
-      - run:
-          name: Test Go API Client
-          working_directory: /tmp/workspace/go
-          command: go test -v ./
-
   validate-typescript:
     docker: 
       - image: cimg/node:18.14
@@ -80,6 +48,42 @@ jobs:
           root: /tmp/workspace
           paths:
             - DERIVED_NEXT_VERSION
+
+  release-go:
+    docker: 
+      - image: cimg/go:1.20.6
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls -al /tmp/workspace
+      - add_ssh_keys:
+          fingerprints:
+            - "99:07:ca:a7:90:f1:29:1a:9a:a7:63:7b:d8:8c:02:e1"
+      - run:
+          name: Prep GitHub
+          working_directory: /tmp/workspace/go
+          command: |
+            git config user.email "<community-group@sonatype.com>"
+            git config user.name "CircleCI Job"
+            git init .
+            git remote add git@github.com:sonatype-nexus-community/nexus-iq-api-client-go.git
+            git checkout main
+            git add ./*
+            git commit --allow-empty -am "Update generated Go Client [skip ci]"
+            git push origin main
+      - run:
+          name: Build the Generated API Client
+          working_directory: /tmp/workspace/go
+          command: go mod download && go mod verify && go mod tidy && go build -v ./
+      - run:
+          name: Test Go API Client
+          working_directory: /tmp/workspace/go
+          command: go test -v ./
+      - run:
+          name: Tag as Release
+          command: |
+            git tag -a "v${$(cat /tmp/workspace/DERIVED_NEXT_VERSION)}" -m 'Release by CircleCI'
+            git push --tags
 
   release-typescript:
     docker: 
@@ -115,9 +119,6 @@ workflows:
           matrix:
             parameters:
               library: [csharp, go, typescript]
-      - validate-go:
-          requires:
-            - generate-library
       - validate-typescript:
           requires:
             - generate-library
@@ -148,6 +149,14 @@ workflows:
               ignore: /.*/
           requires:
             - validate-typescript
+      - release-go:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - determine-release-version
       - release-typescript:
           context:
             - auditjs
