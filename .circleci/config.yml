@@ -32,7 +32,21 @@ jobs:
       - run:
           name: Build the Generated API Client
           working_directory: /tmp/workspace/go
-          command: go build -v ./
+          command: go mod download && go mod verify && go mod tidy && go build -v ./
+      - add_ssh_keys:
+          fingerprints:
+            - "99:07:ca:a7:90:f1:29:1a:9a:a7:63:7b:d8:8c:02:e1"
+      - run:
+          name: Prep GitHub
+          command: |
+            git config user.email "<community-group@sonatype.com>"
+            git config user.name "CircleCI Job"
+      - run:
+          name: Commit generated code to GitHub
+          command: |
+            git add out/go
+            git commit --allow-empty -am "Update generated Go Client [skip ci]"
+            git push origin master
 
   validate-typescript:
     docker: 
