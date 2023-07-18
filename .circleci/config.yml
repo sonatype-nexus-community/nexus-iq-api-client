@@ -22,6 +22,18 @@ jobs:
           paths:
             - "<< parameters.library >>"
 
+  validate-go:
+    docker: 
+      - image: cimg/go:1.20.6
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: ls -al /tmp/workspace
+      - run:
+          name: Build Go API Client
+          working_directory: /tmp/workspace/go
+          command: go build -v ./
+
   validate-typescript:
     docker: 
       - image: cimg/node:18.14
@@ -119,6 +131,9 @@ workflows:
           matrix:
             parameters:
               library: [csharp, go, typescript]
+      - validate-go:
+          requires:
+            - generate-library
       - validate-typescript:
           requires:
             - generate-library
@@ -133,6 +148,14 @@ workflows:
           matrix:
             parameters:
               library: [csharp, typescript]
+      - validate-go:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - generate-library
       - validate-typescript:
           filters:
             tags:
@@ -148,6 +171,7 @@ workflows:
             branches:
               ignore: /.*/
           requires:
+            - validate-go
             - validate-typescript
       - release-go:
           filters:
