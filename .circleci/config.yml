@@ -70,7 +70,7 @@ jobs:
       - run: ls -al /tmp/workspace
       - add_ssh_keys:
           fingerprints:
-            - "99:07:ca:a7:90:f1:29:1a:9a:a7:63:7b:d8:8c:02:e1"
+            - "ee:db:7e:5a:b7:1d:41:8c:5e:d6:75:cd:9d:1a:41:53"
       - run:
           name: Add github.com to known hosts
           command: mkdir -p ~/.ssh && touch ~/.ssh/known_hosts && ssh-keyscan github.com >> ~/.ssh/known_hosts
