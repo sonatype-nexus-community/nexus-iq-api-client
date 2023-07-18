@@ -100,7 +100,7 @@ jobs:
       - run:
           name: Tag as Release
           command: |
-            git tag -a "v${$(cat /tmp/workspace/DERIVED_NEXT_VERSION)}" -m 'Release by CircleCI'
+            git tag -a "v$(cat /tmp/workspace/DERIVED_NEXT_VERSION)" -m 'Release by CircleCI'
             git push --tags
 
   release-typescript:
