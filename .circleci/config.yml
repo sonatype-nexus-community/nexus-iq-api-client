@@ -83,6 +83,7 @@ jobs:
             git config user.email "<community-group@sonatype.com>"
             git config user.name "CircleCI Job"
             git remote add origin git@github.com:sonatype-nexus-community/nexus-iq-api-client-go.git
+            git fetch
             git add ./*
             git commit --allow-empty -am "Update generated Go Client [skip ci]"
             git branch --set-upstream-to=origin/main main
