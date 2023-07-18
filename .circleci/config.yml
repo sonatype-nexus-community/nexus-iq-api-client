@@ -99,6 +99,7 @@ jobs:
           command: go test -v ./
       - run:
           name: Tag as Release
+          working_directory: /tmp/workspace/go
           command: |
             git tag -a "v$(cat /tmp/workspace/DERIVED_NEXT_VERSION)" -m 'Release by CircleCI'
             git push --tags
