@@ -1,7 +1,6 @@
 '!include': 'common.yaml'
 outputDir: /local/out/go
 generatorName: go
+gitRepoId: nexus-iq-api-client-go
 additionalProperties:
   goImportAlias: iqclient
-  isGoSubmodule: true
-  packageName: goclient
