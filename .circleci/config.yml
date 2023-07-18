@@ -72,6 +72,9 @@ jobs:
           fingerprints:
             - "99:07:ca:a7:90:f1:29:1a:9a:a7:63:7b:d8:8c:02:e1"
       - run:
+          name: Add github.com to known hosts
+          command: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run:
           name: Prep GitHub
           working_directory: /tmp/workspace/go
           command: |
