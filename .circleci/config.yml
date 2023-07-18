@@ -79,7 +79,7 @@ jobs:
             git init .
             git config user.email "<community-group@sonatype.com>"
             git config user.name "CircleCI Job"
-            git remote add git@github.com:sonatype-nexus-community/nexus-iq-api-client-go.git
+            git remote add origin git@github.com:sonatype-nexus-community/nexus-iq-api-client-go.git
             git checkout main
             git add ./*
             git commit --allow-empty -am "Update generated Go Client [skip ci]"
