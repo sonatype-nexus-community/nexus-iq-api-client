@@ -147,7 +147,7 @@ workflows:
               ignore: /.*/
           matrix:
             parameters:
-              library: [csharp, typescript]
+              library: [csharp, go, typescript]
       - validate-go:
           filters:
             tags:
