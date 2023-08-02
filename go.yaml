@@ -3,4 +3,5 @@ outputDir: /local/out/go
 generatorName: go
 gitRepoId: nexus-iq-api-client-go
 additionalProperties:
-  goImportAlias: iqclient
+  goImportAlias: sonatypeiq
+  packageName: sonatypeiq
