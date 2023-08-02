@@ -3026,7 +3026,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype IQ Server
-  version: '164'
+  version: '165'
 openapi: 3.0.1
 paths:
   /api/v2/applicationCategories/application:
@@ -3243,9 +3243,7 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/ApiApplicationCategoryDTO'
-                type: array
+                $ref: '#/components/schemas/ApiApplicationListDTO'
           description: default response
       tags:
       - Applications

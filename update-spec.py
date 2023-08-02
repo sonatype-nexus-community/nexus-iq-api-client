@@ -79,10 +79,7 @@ if 'paths' in json_spec and '/api/v2/applications' in json_spec['paths']:
                 'content': {
                     'application/json': {
                         'schema': {
-                            'type': 'array',
-                            'items': {
-                                '$ref': '#/components/schemas/ApiApplicationCategoryDTO'
-                            }
+                            '$ref': '#/components/schemas/ApiApplicationListDTO'
                         }
                     }
                 }
