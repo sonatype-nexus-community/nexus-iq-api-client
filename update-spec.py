@@ -86,6 +86,93 @@ if 'paths' in json_spec and '/api/v2/applications' in json_spec['paths']:
             }
         }
 
+# Add schemas for /api/v2/config
+if 'components' in json_spec and 'schemas' in json_spec['components'] \
+        and 'SystemConfig' not in json_spec['components']:
+    print('Injecting schema: SystemConfigProperty...')
+    json_spec['components']['schemas']['SystemConfigProperty'] = {
+        'type': 'string',
+        'enum': [
+            'baseUrl',
+            'forceBaseUrl'
+        ]
+    }
+
+    print('Injecting schema: SystemConfig...')
+    json_spec['components']['schemas']['SystemConfig'] = {
+        'properties': {
+            'baseUrl': {
+                'nullable': True,
+                'type': 'string'
+            },
+            'forceBaseUrl': {
+                'nullable': True,
+                'type': 'boolean'
+            }
+        }
+    }
+
+# Fix Response schema for GET /api/v2/config
+if 'paths' in json_spec and '/api/v2/config' in json_spec['paths']:
+    if 'delete' in json_spec['paths']['/api/v2/config']:
+        print('Fixing DELETE /api/v2/config...')
+        json_spec['paths']['/api/v2/config']['delete']['parameters'][0].update({
+            'schema': {
+                'items': {
+                    '$ref': '#/components/schemas/SystemConfigProperty'
+                },
+                'type': 'array',
+                'uniqueItems': True
+            }
+        })
+        json_spec['paths']['/api/v2/config']['delete']['responses'] = {
+            204: {
+                'description': 'System Configuration removed',
+                'content': {}
+            }
+        }
+
+    if 'get' in json_spec['paths']['/api/v2/config']:
+        print('Fixing GET /api/v2/config...')
+        json_spec['paths']['/api/v2/config']['get']['parameters'][0].update({
+            'schema': {
+                'items': {
+                    '$ref': '#/components/schemas/SystemConfigProperty'
+                },
+                'type': 'array',
+                'uniqueItems': True
+            }
+        })
+        json_spec['paths']['/api/v2/config']['get']['responses'] = {
+            200: {
+                'description': 'System Configuration retrieved',
+                'content': {
+                    'application/json': {
+                        'schema': {
+                            '$ref': '#/components/schemas/SystemConfig'
+                        }
+                    }
+                }
+            }
+        }
+    if 'put' in json_spec['paths']['/api/v2/config']:
+        print('Fixing GET /api/v2/config...')
+        json_spec['paths']['/api/v2/config']['put']['requestBody'] = {
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/SystemConfig'
+                    }
+                }
+            }
+        }
+        json_spec['paths']['/api/v2/config']['put']['responses'] = {
+            204: {
+                'description': 'System Configuration updated',
+                'content': {}
+            }
+        }
+
 # Fix `ApiComponentDetailsDTOV2` schema
 if 'components' in json_spec and 'schemas' in json_spec['components'] \
         and 'ApiComponentDetailsDTOV2' in json_spec['components']['schemas']:

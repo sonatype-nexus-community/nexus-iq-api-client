@@ -1620,6 +1620,15 @@ components:
             $ref: '#/components/schemas/ApiPolicyViolationStageDTO'
           type: array
       type: object
+    ApiRequestPolicyWaiverDTO:
+      properties:
+        addWaiverLink:
+          type: string
+        comment:
+          type: string
+        policyViolationLink:
+          type: string
+      type: object
     ApiReverseProxyAuthenticationConfigurationDTO:
       properties:
         csrfProtectionDisabled:
@@ -2971,6 +2980,19 @@ components:
         mostRecentScanId:
           type: string
       type: object
+    SystemConfig:
+      properties:
+        baseUrl:
+          nullable: true
+          type: string
+        forceBaseUrl:
+          nullable: true
+          type: boolean
+    SystemConfigProperty:
+      enum:
+      - baseUrl
+      - forceBaseUrl
+      type: string
     TagsByOwnerDTO:
       properties:
         applicationCategories:
@@ -3780,14 +3802,13 @@ paths:
         name: property
         schema:
           items:
-            type: string
+            $ref: '#/components/schemas/SystemConfigProperty'
           type: array
           uniqueItems: true
       responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
+        204:
+          content: {}
+          description: System Configuration removed
       tags:
       - Config
     get:
@@ -3797,18 +3818,16 @@ paths:
         name: property
         schema:
           items:
-            type: string
+            $ref: '#/components/schemas/SystemConfigProperty'
           type: array
           uniqueItems: true
       responses:
-        default:
+        200:
           content:
             application/json:
               schema:
-                additionalProperties:
-                  type: object
-                type: object
-          description: default response
+                $ref: '#/components/schemas/SystemConfig'
+          description: System Configuration retrieved
       tags:
       - Config
     put:
@@ -3817,14 +3836,11 @@ paths:
         content:
           application/json:
             schema:
-              additionalProperties:
-                type: object
-              type: object
+              $ref: '#/components/schemas/SystemConfig'
       responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
+        204:
+          content: {}
+          description: System Configuration updated
       tags:
       - Config
   /api/v2/config/artifactoryConnection/{ownerType}/{internalOwnerId}:
@@ -5768,6 +5784,27 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApiWaiverOptionsDTO'
+      responses:
+        default:
+          content:
+            '*/*': {}
+          description: default response
+      tags:
+      - Policy Waivers
+  /api/v2/policyWaivers/waiverRequests/{policyViolationId}:
+    post:
+      operationId: requestPolicyWaiver
+      parameters:
+      - in: path
+        name: policyViolationId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiRequestPolicyWaiverDTO'
       responses:
         default:
           content:
