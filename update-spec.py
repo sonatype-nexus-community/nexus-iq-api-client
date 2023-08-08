@@ -185,6 +185,18 @@ if 'components' in json_spec and 'schemas' in json_spec['components'] \
 
     json_spec['components']['schemas']['ApiComponentDetailsDTOV2'] = new_api_component_details_dto_v2
 
+# Fix `ApiMailConfigurationDTO` schema
+if 'components' in json_spec and 'schemas' in json_spec['components'] \
+        and 'ApiMailConfigurationDTO' in json_spec['components']['schemas']:
+    print('Fixing schema: ApiMailConfigurationDTO...')
+    new_api_mail_configuration_dto = json_spec['components']['schemas']['ApiMailConfigurationDTO']
+
+    new_api_mail_configuration_dto['properties']['password'] = {
+        'type': 'string'
+    }
+
+    json_spec['components']['schemas']['ApiMailConfigurationDTO'] = new_api_mail_configuration_dto
+
 # Remove APIs with incomplete schemas
 API_PATHS_TO_REMOVE = {
     '/api/v2/licenseLegalMetadata/customMultiApplication/report': [],

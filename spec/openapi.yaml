@@ -1007,9 +1007,7 @@ components:
         hostname:
           type: string
         password:
-          items:
-            type: string
-          type: array
+          type: string
         passwordIsIncluded:
           type: boolean
         port:
