@@ -197,6 +197,18 @@ if 'components' in json_spec and 'schemas' in json_spec['components'] \
 
     json_spec['components']['schemas']['ApiMailConfigurationDTO'] = new_api_mail_configuration_dto
 
+# Fix `ApiProxyServerConfigurationDTO` schema
+if 'components' in json_spec and 'schemas' in json_spec['components'] \
+        and 'ApiProxyServerConfigurationDTO' in json_spec['components']['schemas']:
+    print('Fixing schema: ApiProxyServerConfigurationDTO...')
+    new_api_proxy_server_configuration_dto = json_spec['components']['schemas']['ApiProxyServerConfigurationDTO']
+
+    new_api_proxy_server_configuration_dto['properties']['password'] = {
+        'type': 'string'
+    }
+
+    json_spec['components']['schemas']['ApiProxyServerConfigurationDTO'] = new_api_proxy_server_configuration_dto
+
 # Remove APIs with incomplete schemas
 API_PATHS_TO_REMOVE = {
     '/api/v2/licenseLegalMetadata/customMultiApplication/report': [],
