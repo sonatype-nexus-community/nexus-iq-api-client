@@ -266,6 +266,7 @@ components:
         applicationId:
           type: string
         errorMessage:
+          nullable: true
           type: string
         evaluationDate:
           format: date-time

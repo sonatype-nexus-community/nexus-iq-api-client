@@ -185,6 +185,16 @@ if 'components' in json_spec and 'schemas' in json_spec['components'] \
 
     json_spec['components']['schemas']['ApiComponentDetailsDTOV2'] = new_api_component_details_dto_v2
 
+# Fix `ApiComponentEvaluationResultDTOV2` schema
+if 'components' in json_spec and 'schemas' in json_spec['components'] \
+        and 'ApiComponentEvaluationResultDTOV2' in json_spec['components']['schemas']:
+    print('Fixing schema: ApiComponentEvaluationResultDTOV2...')
+    new_api_cer_dto = json_spec['components']['schemas']['ApiComponentEvaluationResultDTOV2']
+
+    new_api_cer_dto['properties']['errorMessage'].update({'nullable': True})
+
+    json_spec['components']['schemas']['ApiComponentEvaluationResultDTOV2'] = new_api_cer_dto
+
 # Fix `ApiMailConfigurationDTO` schema
 if 'components' in json_spec and 'schemas' in json_spec['components'] \
         and 'ApiMailConfigurationDTO' in json_spec['components']['schemas']:
