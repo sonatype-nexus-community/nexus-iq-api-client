@@ -61,41 +61,7 @@ The following API endpoints are removed from the schema prior to generation of t
 
 ### Additional Changes to OpenAPI Schema prior to Generation
 
-1. Authentication is not defined - add the YAML block under `components`:
-   ```
-   ...
-      securitySchemes:
-        BasicAuth:
-            type: http
-            scheme: basic
-   ...
-   ```
-
-And add the root `security` block to the end of the schema file:
-
-  ```
-  ...
-  security:
-    - BasicAuth: []
-  ```
-
-2. Response Schema added to `getApplications`:
-   ```
-        application/json:
-              schema:
-                type: object
-                properties:
-                  applications:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ApiApplicationDTO'
-   ```
-
-3. Schema for `ApiComponentDetailsDTOV2` does not define the following properties as `nullable` when they should be:
-
-- `relativePopularity`
-- `integrityRating`
-- `hygieneRating`
+*See `update-spec.py` for all changes.*
 
 ## Getting the latest OpenAPI Schema
 
@@ -108,6 +74,66 @@ docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli batch --cl
 
 docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli generate -i /local/spec/openapi.yaml -g typescript-fetch -o /local/out/test -c /local/openapi-config.yaml -v > out.log
 ```
+
+## Diagnosing Responses that are not Schema Compliant
+
+In the rare event that Sonatype IQ Server provides a response that does not validate against the schema (our patched schema to be clear), things can be silent - you just never get a response in your code.
+
+Through the use of [Postman](https://www.postman.com) and [opeapi-request-response-validation](https://github.com/gcatanese/openapi-request-response-validation) project by [Beppe Catanese](https://github.com/gcatanese), we can quickly and accurately see where response validation failures occur.
+
+1. Configure the request for which you are not getting a response in Postman exactly as it was sent
+2. To that request (you can do this in a Collection if you are using Collections too), add a Test with the code:
+   ```
+    // define object
+    openapiRequestResponseValidation = {
+    // define function
+    validate: function(pm) {
+
+        const postRequest = {
+            url: 'http://localhost:8080/validate',
+            method: 'POST',
+            header: {'Content-Type': 'application/json'},
+            body: {
+            mode: 'raw',
+            raw: JSON.stringify({ 
+                method: pm.request.method, 
+                path: pm.request.url.getPath(),
+                headers: pm.request.headers,
+                requestAsJson: (pm.request.body != "") ? pm.request.body.raw : null,
+                responseAsJson: pm.response.text(),
+                statusCode: pm.response.code
+                })
+            }
+        };
+
+        pm.sendRequest(postRequest, (error, response) => {
+            if(error != undefined) {
+                pm.expect.fail('Unexpected error ' + error);
+            } else {
+                var data = response.json();
+
+                if(data.valid == false) {
+                    console.log(data.errors);
+                }
+
+                pm.test("OpenAPI validation", () => {
+                    pm.expect(data.valid, "Invalid request/response (check Console)").to.equal(true);
+                });
+
+            }
+        });  
+      }
+    };
+
+    // invoke function
+    openapiRequestResponseValidation.validate(pm);
+3. Start the `openapi-request-response-validation` Container locally:
+   ```
+   docker run -p 8080:8080 -v ./spec:/openapi -it --rm gcatanese/openapi-request-response-validation
+   ```
+4. Execute the request in Postman - if the test does not show as passed then you can get details of the failure from two places:  
+   1. The Postman console
+   2. The logs from the running Container 
 
 ## Changelog
 
