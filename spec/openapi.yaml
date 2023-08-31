@@ -689,6 +689,11 @@ components:
           format: int64
           type: integer
       type: object
+    ApiGlobalInformationDTOV2:
+      properties:
+        dataVersionDate:
+          type: string
+      type: object
     ApiHashComponentIdentifierDTO:
       properties:
         comment:
@@ -1476,6 +1481,8 @@ components:
           items:
             $ref: '#/components/schemas/ApiReportComponentDTOV2'
           type: array
+        globalInformation:
+          $ref: '#/components/schemas/ApiGlobalInformationDTOV2'
         matchSummary:
           $ref: '#/components/schemas/ApiMatchStateSummaryDTOV2'
       type: object
@@ -3037,15 +3044,8 @@ components:
       scheme: basic
       type: http
 info:
-  contact:
-    name: Sonatype Community Maintainers
-    url: https://github.com/sonatype-nexus-community
-  description: This documents the available APIs into [Sonatype IQ Server](https://www.sonatype.com/products/open-source-security-dependency-management).
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  title: Sonatype IQ Server
-  version: '165'
+  title: Sonatype Lifecycle Public REST API
+  version: 1.166.0-01
 openapi: 3.0.1
 paths:
   /api/v2/applicationCategories/application:
@@ -3620,6 +3620,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository
           type: string
       - in: path
         name: ownerId
@@ -3685,6 +3686,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -3721,6 +3723,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -3758,6 +3761,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -3854,6 +3858,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -3887,6 +3892,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -3920,6 +3926,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -3952,6 +3959,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -3986,6 +3994,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -4017,6 +4026,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -4050,6 +4060,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -4089,6 +4100,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -4481,6 +4493,7 @@ paths:
         name: cdxVersion
         required: true
         schema:
+          pattern: 1.1|1.2|1.3|1.4
           type: string
       responses:
         default:
@@ -4508,6 +4521,7 @@ paths:
         name: cdxVersion
         required: true
         schema:
+          pattern: 1.1|1.2|1.3|1.4
           type: string
       responses:
         default:
@@ -4566,6 +4580,7 @@ paths:
           enum:
           - public
           - experimental
+          pattern: public|experimental
           type: string
       responses:
         default:
@@ -4893,6 +4908,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -4928,6 +4944,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -4961,6 +4978,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -4995,6 +5013,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5024,6 +5043,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5058,6 +5078,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5320,6 +5341,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: ownerId
@@ -5516,6 +5538,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: ownerId
@@ -5562,6 +5585,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application
           type: string
       - in: path
         name: ownerId
@@ -5632,6 +5656,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       requestBody:
         content:
@@ -5659,6 +5684,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: ownerId
@@ -5708,6 +5734,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application
           type: string
       - in: path
         name: ownerId
@@ -5753,6 +5780,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application
           type: string
       - in: path
         name: ownerId
@@ -5823,6 +5851,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5854,6 +5883,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5891,6 +5921,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5922,6 +5953,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization|repository|repository_container
           type: string
       - in: path
         name: ownerId
@@ -6126,6 +6158,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: global|repository_container
           type: string
       responses:
         default:
@@ -6150,6 +6183,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: global|repository_container
           type: string
       - in: path
         name: roleId
@@ -6163,6 +6197,7 @@ paths:
           enum:
           - USER
           - GROUP
+          pattern: user|group
           type: string
       - in: path
         name: memberName
@@ -6189,6 +6224,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: global|repository_container
           type: string
       - in: path
         name: roleId
@@ -6202,6 +6238,7 @@ paths:
           enum:
           - USER
           - GROUP
+          pattern: user|group
           type: string
       - in: path
         name: memberName
@@ -6229,6 +6266,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -6258,6 +6296,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -6276,6 +6315,7 @@ paths:
           enum:
           - USER
           - GROUP
+          pattern: user|group
           type: string
       - in: path
         name: memberName
@@ -6302,6 +6342,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -6320,6 +6361,7 @@ paths:
           enum:
           - USER
           - GROUP
+          pattern: user|group
           type: string
       - in: path
         name: memberName
@@ -6572,6 +6614,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -6598,6 +6641,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -6626,6 +6670,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -6659,6 +6704,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
@@ -6693,6 +6739,7 @@ paths:
           - repository_container
           - repository
           - global
+          pattern: application|organization
           type: string
       - in: path
         name: internalOwnerId
