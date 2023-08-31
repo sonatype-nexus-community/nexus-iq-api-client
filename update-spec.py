@@ -219,6 +219,29 @@ if 'components' in json_spec and 'schemas' in json_spec['components'] \
 
     json_spec['components']['schemas']['ApiProxyServerConfigurationDTO'] = new_api_proxy_server_configuration_dto
 
+# Add missing schema `ApiThirdPartyScanTicketDTO`
+if 'components' in json_spec and 'schemas' in json_spec['components'] \
+        and 'ApiThirdPartyScanTicketDTO' not in json_spec['components']['schemas']:
+    print('Adding schema: ApiThirdPartyScanTicketDTO...')
+
+    json_spec['components']['schemas']['ApiThirdPartyScanTicketDTO'] = {
+        'properties': {
+            'statusUrl': {
+                'type': 'string'
+            }
+        }
+    }
+
+# Fix Response schema for POST /api/v2/scan/applications/{applicationId}/sources/{source}
+if 'paths' in json_spec and '/api/v2/scan/applications/{applicationId}/sources/{source}' in json_spec['paths']:
+    if 'post' in json_spec['paths']['/api/v2/scan/applications/{applicationId}/sources/{source}']:
+        print('Fixing POST /api/v2/scan/applications/{applicationId}/sources/{source}...')
+        json_spec['paths']['/api/v2/scan/applications/{applicationId}/sources/{source}']['post']['responses']['default']['content']['application/json'].update({
+            'schema': {
+                '$ref': '#/components/schemas/ApiThirdPartyScanTicketDTO'
+            }
+        })
+
 # Remove APIs with incomplete schemas
 API_PATHS_TO_REMOVE = {
     '/api/v2/licenseLegalMetadata/customMultiApplication/report': [],

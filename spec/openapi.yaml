@@ -2068,6 +2068,10 @@ components:
         reportPdfUrl:
           type: string
       type: object
+    ApiThirdPartyScanTicketDTO:
+      properties:
+        statusUrl:
+          type: string
     ApiUserDTO:
       properties:
         email:
@@ -6435,7 +6439,9 @@ paths:
       responses:
         default:
           content:
-            application/json: {}
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiThirdPartyScanTicketDTO'
           description: default response
       tags:
       - Scan
