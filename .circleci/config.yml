@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Generate << parameters.library >> API Client 
           command: |
-            docker run --rm -v "$CIRCLE_WORKING_DIRECTORY:/local" openapitools/openapi-generator-cli batch --clean /local/<< parameters.library >>.yaml
+            docker run --rm -v "$CIRCLE_WORKING_DIRECTORY:/local" openapitools/openapi-generator-cli:v7.3.0 batch --clean /local/<< parameters.library >>.yaml
       - persist_to_workspace:
           root: out
           paths:
