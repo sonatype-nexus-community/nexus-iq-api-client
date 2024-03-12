@@ -160,6 +160,7 @@ components:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           type: string
@@ -189,6 +190,26 @@ components:
           type: string
         inheritedFromOrganizationName:
           type: string
+      type: object
+    ApiCallFlowAnalysisConfigDTO:
+      properties:
+        algorithm:
+          enum:
+          - CLASS_HIERARCHY_ANALYSIS
+          type: string
+        enabled:
+          type: boolean
+        id:
+          type: string
+        namespaces:
+          items:
+            type: string
+          type: array
+        ownerId:
+          type: string
+        threadCount:
+          format: int32
+          type: integer
       type: object
     ApiComponentChangeActionDTO:
       properties:
@@ -653,6 +674,15 @@ components:
         severe:
           format: int32
           type: integer
+      type: object
+    ApiFirewallMetricsResultDTO:
+      properties:
+        firewallMetricsValue:
+          format: int32
+          type: integer
+        latestUpdatedTime:
+          format: date-time
+          type: string
       type: object
     ApiFirewallQuarantineSummaryDTO:
       properties:
@@ -1347,6 +1377,8 @@ components:
       properties:
         componentIdentifier:
           $ref: '#/components/schemas/ApiComponentIdentifierDTOV2'
+        cpe:
+          type: string
         dependencyData:
           $ref: '#/components/schemas/ApiDependencyDataDTO'
         displayName:
@@ -1371,6 +1403,8 @@ components:
           $ref: '#/components/schemas/ApiSecurityDataDTO'
         sha256:
           type: string
+        swid:
+          $ref: '#/components/schemas/Swid'
         thirdParty:
           type: boolean
       type: object
@@ -1461,6 +1495,8 @@ components:
           type: array
         grandfathered:
           type: boolean
+        legacyViolation:
+          type: boolean
         policyId:
           type: string
         policyName:
@@ -1515,6 +1551,8 @@ components:
           type: string
         scanId:
           type: string
+        scanTriggerType:
+          type: string
         stage:
           type: string
       type: object
@@ -1560,6 +1598,56 @@ components:
         thirdParty:
           type: boolean
       type: object
+    ApiRepositoryComponentEvaluationRequest:
+      properties:
+        hash:
+          type: string
+        packageUrl:
+          type: string
+        pathname:
+          type: string
+      type: object
+    ApiRepositoryComponentEvaluationRequestList:
+      properties:
+        components:
+          items:
+            $ref: '#/components/schemas/ApiRepositoryComponentEvaluationRequest'
+          type: array
+        format:
+          type: string
+      type: object
+    ApiRepositoryComponentEvaluationResult:
+      properties:
+        catalogDate:
+          format: date-time
+          type: string
+        component:
+          $ref: '#/components/schemas/ApiRepositoryComponentEvaluationRequest'
+        policyViolations:
+          items:
+            $ref: '#/components/schemas/ApiPolicyViolationDTOV2'
+          type: array
+        quarantineDate:
+          format: date-time
+          type: string
+        quarantined:
+          type: boolean
+      type: object
+    ApiRepositoryComponentEvaluationResultList:
+      properties:
+        repositoryId:
+          type: string
+        repositoryManagerId:
+          type: string
+        repositoryPublicId:
+          type: string
+        repositoryType:
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/ApiRepositoryComponentEvaluationResult'
+          type: array
+      type: object
     ApiRepositoryComponentPath:
       properties:
         pathname:
@@ -1589,14 +1677,58 @@ components:
         repository:
           $ref: '#/components/schemas/ApiRepositoryDTO'
       type: object
+    ApiRepositoryContainerDTO:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      type: object
     ApiRepositoryDTO:
       properties:
+        auditEnabled:
+          type: boolean
         format:
           type: string
+        namespaceConfusionProtectionEnabled:
+          type: boolean
+        policyCompliantComponentSelectionEnabled:
+          type: boolean
         publicId:
           type: string
+        quarantineEnabled:
+          type: boolean
         repositoryId:
           type: string
+        type:
+          type: string
+      type: object
+    ApiRepositoryListDTO:
+      properties:
+        repositories:
+          items:
+            $ref: '#/components/schemas/ApiRepositoryDTO'
+          type: array
+      type: object
+    ApiRepositoryManagerDTO:
+      properties:
+        id:
+          type: string
+        instanceId:
+          type: string
+        name:
+          type: string
+        productName:
+          type: string
+        productVersion:
+          type: string
+      type: object
+    ApiRepositoryManagerListDTO:
+      properties:
+        repositoryManagers:
+          items:
+            $ref: '#/components/schemas/ApiRepositoryManagerDTO'
+          type: array
       type: object
     ApiRepositoryPathResponseDTO:
       properties:
@@ -1769,8 +1901,21 @@ components:
             $ref: '#/components/schemas/ApiSecurityIssueDTO'
           type: array
       type: object
+    ApiSecurityIssueAnalysisDTO:
+      properties:
+        detail:
+          type: string
+        justification:
+          type: string
+        response:
+          type: string
+        state:
+          type: string
+      type: object
     ApiSecurityIssueDTO:
       properties:
+        analysis:
+          $ref: '#/components/schemas/ApiSecurityIssueAnalysisDTO'
         cvssVector:
           type: string
         cvssVectorSource:
@@ -2057,6 +2202,9 @@ components:
           type: integer
         isError:
           type: boolean
+        legacyViolations:
+          format: int32
+          type: integer
         openPolicyViolations:
           $ref: '#/components/schemas/ApiEvaluationResultCounterDTO'
         policyAction:
@@ -2172,6 +2320,7 @@ components:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           type: string
@@ -2214,6 +2363,7 @@ components:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           type: string
@@ -2224,6 +2374,15 @@ components:
           items:
             $ref: '#/components/schemas/ApplicationTagsByOwnerDTO'
           type: array
+      type: object
+    AttachmentText:
+      properties:
+        content:
+          type: string
+        contentType:
+          type: string
+        encoding:
+          type: string
       type: object
     AttributionReportTemplateDTO:
       properties:
@@ -2583,6 +2742,8 @@ components:
           - policyName
           - policyThreatCategory
           - policyThreatLevel
+          - parentOrganizationName
+          - parentOrganizationId
           type: string
         searchResultItemDTOS:
           items:
@@ -2621,6 +2782,7 @@ components:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           type: string
@@ -2737,6 +2899,9 @@ components:
           format: int32
           type: integer
         grandfatheredPolicyViolationCount:
+          format: int32
+          type: integer
+        legacyViolationCount:
           format: int32
           type: integer
         moderateComponentCount:
@@ -2966,6 +3131,8 @@ components:
           type: number
         source:
           type: string
+        sourceLabel:
+          type: string
         vector:
           type: string
       type: object
@@ -2986,6 +3153,22 @@ components:
           format: date-time
           type: string
         mostRecentScanId:
+          type: string
+      type: object
+    Swid:
+      properties:
+        name:
+          type: string
+        patch:
+          type: boolean
+        tagId:
+          type: string
+        tagVersion:
+          format: int32
+          type: integer
+        text:
+          $ref: '#/components/schemas/AttachmentText'
+        version:
           type: string
       type: object
     SystemConfig:
@@ -3016,6 +3199,7 @@ components:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           type: string
@@ -3049,7 +3233,7 @@ components:
       type: http
 info:
   title: Sonatype Lifecycle Public REST API
-  version: 1.166.0-01
+  version: 1.174.0-01
 openapi: 3.0.1
 paths:
   /api/v2/applicationCategories/application:
@@ -3532,6 +3716,100 @@ paths:
           description: default response
       tags:
       - Applications
+  /api/v2/callFlowAnalysis/configuration/{ownerType}/{ownerId}:
+    delete:
+      operationId: deleteCallFlowAnalysisConfig
+      parameters:
+      - in: path
+        name: ownerType
+        required: true
+        schema:
+          enum:
+          - application
+          - organization
+          - repository_container
+          - repository_manager
+          - repository
+          - global
+          pattern: application|organization
+          type: string
+      - in: path
+        name: ownerId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+      tags:
+      - Call Flow Analysis
+    get:
+      operationId: getCallFlowAnalysisConfig
+      parameters:
+      - in: path
+        name: ownerType
+        required: true
+        schema:
+          enum:
+          - application
+          - organization
+          - repository_container
+          - repository_manager
+          - repository
+          - global
+          pattern: application|organization
+          type: string
+      - in: path
+        name: ownerId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiCallFlowAnalysisConfigDTO'
+          description: default response
+      tags:
+      - Call Flow Analysis
+    put:
+      operationId: upsertCallFlowAnalysisConfig
+      parameters:
+      - in: path
+        name: ownerType
+        required: true
+        schema:
+          enum:
+          - application
+          - organization
+          - repository_container
+          - repository_manager
+          - repository
+          - global
+          pattern: application|organization
+          type: string
+      - in: path
+        name: ownerId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiCallFlowAnalysisConfigDTO'
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiCallFlowAnalysisConfigDTO'
+          description: default response
+      tags:
+      - Call Flow Analysis
   /api/v2/claim/components:
     get:
       operationId: getAll
@@ -3622,6 +3900,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization|repository
@@ -3688,6 +3967,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -3725,6 +4005,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -3763,6 +4044,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -3860,6 +4142,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -3894,6 +4177,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -3928,6 +4212,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -3961,6 +4246,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -3996,6 +4282,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -4028,6 +4315,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -4062,6 +4350,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -4102,6 +4391,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -4439,6 +4729,7 @@ paths:
       - Config Source Control
   /api/v2/cycloneDx/{applicationId}/reports/{reportId}:
     get:
+      deprecated: true
       operationId: getByReportId
       parameters:
       - in: path
@@ -4460,6 +4751,7 @@ paths:
       - Cyclone Dx
   /api/v2/cycloneDx/{applicationId}/stages/{stageId}:
     get:
+      deprecated: true
       operationId: getLatest
       parameters:
       - in: path
@@ -4497,7 +4789,7 @@ paths:
         name: cdxVersion
         required: true
         schema:
-          pattern: 1.1|1.2|1.3|1.4
+          pattern: 1.1|1.2|1.3|1.4|1.5
           type: string
       responses:
         default:
@@ -4525,7 +4817,7 @@ paths:
         name: cdxVersion
         required: true
         schema:
-          pattern: 1.1|1.2|1.3|1.4
+          pattern: 1.1|1.2|1.3|1.4|1.5
           type: string
       responses:
         default:
@@ -4573,6 +4865,24 @@ paths:
           description: default response
       tags:
       - Data Retention Policies
+  /api/v2/dataRetentionPolicies/organizations/{organizationId}/parent:
+    get:
+      operationId: getParentDataRetentionPolicies
+      parameters:
+      - in: path
+        name: organizationId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDataRetentionPoliciesDTO'
+          description: default response
+      tags:
+      - Data Retention Policies
   /api/v2/endpoints/{apiType}:
     get:
       operationId: getOpenAPI
@@ -4597,7 +4907,7 @@ paths:
       - Endpoints
   /api/v2/evaluation/applications/{applicationId}:
     post:
-      operationId: evaluateComponents
+      operationId: evaluateComponents_1
       parameters:
       - in: path
         name: applicationId
@@ -4615,30 +4925,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiComponentEvaluationTicketDTOV2'
-          description: default response
-      tags:
-      - Evaluation
-  /api/v2/evaluation/applications/{applicationId}/manifestEvaluation:
-    post:
-      deprecated: true
-      operationId: deprecatedManifestEvaluation
-      parameters:
-      - in: path
-        name: applicationId
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApiSourceControlEvaluationRequestDTO'
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiApplicationEvaluationStatusDTOV2'
           description: default response
       tags:
       - Evaluation
@@ -4793,7 +5079,10 @@ paths:
       - in: query
         name: policyId
         schema:
-          type: string
+          items:
+            type: string
+          type: array
+          uniqueItems: true
       - in: query
         name: componentName
         schema:
@@ -4811,6 +5100,48 @@ paths:
         default:
           content:
             application/json: {}
+          description: default response
+      tags:
+      - Firewall
+  /api/v2/firewall/components/{repositoryManagerId}/{repositoryId}/evaluate:
+    post:
+      operationId: evaluateComponents
+      parameters:
+      - in: path
+        name: repositoryManagerId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: repositoryId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiRepositoryComponentEvaluationRequestList'
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiRepositoryComponentEvaluationResultList'
+          description: default response
+      tags:
+      - Firewall
+  /api/v2/firewall/metrics/embedded:
+    get:
+      operationId: getFirewallMetrics
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  $ref: '#/components/schemas/ApiFirewallMetricsResultDTO'
+                type: object
           description: default response
       tags:
       - Firewall
@@ -4898,6 +5229,122 @@ paths:
           description: default response
       tags:
       - Firewall
+  /api/v2/firewall/repositories/configuration/{repositoryManagerId}:
+    get:
+      operationId: getConfiguredRepositories
+      parameters:
+      - in: path
+        name: repositoryManagerId
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: sinceUtcTimestamp
+        schema:
+          format: int64
+          type: integer
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiRepositoryListDTO'
+          description: default response
+      tags:
+      - Firewall
+    post:
+      operationId: configureRepositories
+      parameters:
+      - in: path
+        name: repositoryManagerId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiRepositoryListDTO'
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+      tags:
+      - Firewall
+  /api/v2/firewall/repositoryContainer:
+    get:
+      operationId: getRepositoryContainer
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiRepositoryContainerDTO'
+          description: default response
+      tags:
+      - Firewall
+  /api/v2/firewall/repositoryManagers:
+    get:
+      operationId: getRepositoryManagers
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiRepositoryManagerListDTO'
+          description: default response
+      tags:
+      - Firewall
+    post:
+      operationId: addRepositoryManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiRepositoryManagerDTO'
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiRepositoryManagerDTO'
+          description: default response
+      tags:
+      - Firewall
+  /api/v2/firewall/repositoryManagers/{repositoryManagerId}:
+    delete:
+      operationId: deleteRepositoryManager
+      parameters:
+      - in: path
+        name: repositoryManagerId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+      tags:
+      - Firewall
+    get:
+      operationId: getRepositoryManager
+      parameters:
+      - in: path
+        name: repositoryManagerId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiRepositoryManagerDTO'
+          description: default response
+      tags:
+      - Firewall
   /api/v2/labels/{ownerType}/{ownerId}:
     get:
       operationId: getLabels
@@ -4910,9 +5357,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -4946,9 +5394,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -4980,9 +5429,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5015,9 +5465,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5045,9 +5496,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5080,9 +5532,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5343,6 +5796,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -5418,6 +5872,21 @@ paths:
       tags:
       - Organizations
   /api/v2/organizations/{organizationId}:
+    delete:
+      operationId: deleteOrganization
+      parameters:
+      - in: path
+        name: organizationId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            '*/*': {}
+          description: default response
+      tags:
+      - Organizations
     get:
       operationId: getOrganization
       parameters:
@@ -5484,6 +5953,14 @@ paths:
             type: string
           type: array
           uniqueItems: true
+      - in: query
+        name: openTimeAfter
+        schema:
+          type: string
+      - in: query
+        name: openTimeBefore
+        schema:
+          type: string
       responses:
         default:
           content:
@@ -5540,6 +6017,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -5587,6 +6065,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application
@@ -5658,6 +6137,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -5686,6 +6166,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -5736,6 +6217,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application
@@ -5782,6 +6264,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application
@@ -5853,9 +6336,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5885,9 +6369,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5923,9 +6408,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -5955,9 +6441,10 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
-          pattern: application|organization|repository|repository_container
+          pattern: application|organization|repository|repository_manager|repository_container
           type: string
       - in: path
         name: ownerId
@@ -6160,6 +6647,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: global|repository_container
@@ -6185,6 +6673,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: global|repository_container
@@ -6226,6 +6715,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: global|repository_container
@@ -6268,6 +6758,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -6298,6 +6789,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -6344,6 +6836,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -6391,6 +6884,75 @@ paths:
           description: default response
       tags:
       - Roles
+  /api/v2/sbom/{applicationId}/version/{sbomVersion}:
+    delete:
+      description: Deletes a specific sbom version including it's original contents
+        and updates
+      operationId: deleteSbomVersion
+      parameters:
+      - description: The internal id of the application
+        in: path
+        name: applicationId
+        required: true
+        schema:
+          type: string
+      - description: URL Encoded version value of the sbom to be deleted
+        in: path
+        name: sbomVersion
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Delete successful
+        '404':
+          description: Supplied sbom version not found
+      summary: Delete sbom version
+      tags:
+      - sbom
+    get:
+      description: Downloads a specific sbom version in its original or current form
+      operationId: getSbomVersion
+      parameters:
+      - description: The internal id of the application
+        in: path
+        name: applicationId
+        required: true
+        schema:
+          type: string
+      - description: URL Encoded version value of the sbom to be deleted
+        in: path
+        name: sbomVersion
+        required: true
+        schema:
+          type: string
+      - description: The form of the sbom version. Allowed values [original|current].
+          default = current
+        in: query
+        name: form
+        schema:
+          default: current
+          type: string
+      - description: Output format(json/xml) of the sbom. Changing the output format
+          only applicable when downloading the current form of the SBOM. The original
+          sbom will always return in the original form that it was ingested. When
+          requesting `current` form and if this header value is not present the sbom
+          will be returned in its original ingested format. Allowed values {'application/json'|'application/xml'}.
+          default = null
+        in: header
+        name: Accept
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json|application/xml: {}
+          description: Content of the sbom
+        '404':
+          description: Supplied sbom version not found
+      summary: Gets a sbom version
+      tags:
+      - sbom
   /api/v2/scan/applications/ideUser/overview:
     get:
       operationId: getIdeUsersOverview
@@ -6585,27 +7147,6 @@ paths:
           description: default response
       tags:
       - Security Overrides
-  /api/v2/sourceControl:
-    post:
-      operationId: addOrUpdateSourceControl
-      parameters:
-      - in: query
-        name: publicId
-        schema:
-          type: string
-      - in: query
-        name: repositoryUrl
-        schema:
-          type: string
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiSourceControlDTO'
-          description: default response
-      tags:
-      - Source Control
   /api/v2/sourceControl/{ownerType}/{internalOwnerId}:
     delete:
       operationId: deleteSourceControl
@@ -6618,6 +7159,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -6645,6 +7187,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -6674,6 +7217,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -6708,6 +7252,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -6743,6 +7288,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           pattern: application|organization
@@ -7094,6 +7640,7 @@ paths:
           - application
           - organization
           - repository_container
+          - repository_manager
           - repository
           - global
           type: string
@@ -7115,6 +7662,7 @@ security:
 tags:
 - name: Application Categories
 - name: Applications
+- name: Call Flow Analysis
 - name: Claim
 - name: Components
 - name: Composite Source Control
@@ -7155,3 +7703,4 @@ tags:
 - name: User Tokens
 - name: Users
 - name: Vulnerabilities
+- name: sbom
