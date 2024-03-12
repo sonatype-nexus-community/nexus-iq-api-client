@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Generate << parameters.library >> API Client 
           command: |
-            docker run --rm -v "$CIRCLE_WORKING_DIRECTORY:/local" openapitools/openapi-generator-cli batch --clean /local/<< parameters.library >>.yaml
+            docker run --rm -v "$CIRCLE_WORKING_DIRECTORY:/local" openapitools/openapi-generator-cli:v7.3.0 batch --clean /local/<< parameters.library >>.yaml
       - persist_to_workspace:
           root: out
           paths:
@@ -24,7 +24,7 @@ jobs:
 
   validate-go:
     docker: 
-      - image: cimg/go:1.20.6
+      - image: cimg/go:1.22
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -36,7 +36,7 @@ jobs:
 
   validate-typescript:
     docker: 
-      - image: cimg/node:18.14
+      - image: cimg/node:lts
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -48,7 +48,7 @@ jobs:
 
   determine-release-version:
     machine:
-      image: ubuntu-2204:2022.04.2
+      image: ubuntu-2204:current
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -63,7 +63,7 @@ jobs:
 
   release-go:
     docker: 
-      - image: cimg/go:1.20.6
+      - image: cimg/go:1.22
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -106,7 +106,7 @@ jobs:
 
   release-typescript:
     docker: 
-      - image: cimg/node:18.14
+      - image: cimg/node:lts
     steps:
       - attach_workspace:
           at: /tmp/workspace
