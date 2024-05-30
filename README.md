@@ -18,7 +18,7 @@
 
 # Sonatype IQ Server API Client(s)
 
-[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-iq-api-client/tree/main.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-iq-api-client/tree/main)
+[![CI](https://github.com/sonatype-nexus-community/nexus-iq-api-client/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/sonatype-nexus-community/nexus-iq-api-client/actions/workflows/build.yaml)
 [![GitHub license](https://img.shields.io/github/license/sonatype-nexus-community/nexus-iq-api-client)](https://github.com/sonatype-nexus-community/nexus-iq-api-client/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/sonatype-nexus-community/nexus-iq-api-client)](https://github.com/sonatype-nexus-community/nexus-iq-api-client/issues)
 [![GitHub forks](https://img.shields.io/github/forks/sonatype-nexus-community/nexus-iq-api-client)](https://github.com/sonatype-nexus-community/nexus-iq-api-client/network)
