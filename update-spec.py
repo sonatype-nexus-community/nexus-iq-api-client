@@ -259,5 +259,18 @@ if 'paths' in json_spec:
                 for method in methods:
                     json_spec['paths'][path].pop(method)
 
+# Remove duplicated tags
+# As of 176, some tags are added additionally with descriptions
+if 'tags' in json_spec:
+    print('Ensuring Tags are unique...')
+    tags_seen = []
+    unique_tags = []
+    for tag in json_spec['tags']:
+        if tag['name'] not in tags_seen:
+            tags_seen.append(tag['name'])
+            unique_tags.append(tag)
+    json_spec['tags'] = unique_tags
+
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
