@@ -7963,12 +7963,10 @@ tags:
     \ \n1. Requesting a policy evaluation (POST) \n2. Checking the status and response\
     \ of the evaluation request (GET)"
   name: Policy Evaluation
-- name: Advanced Search
 - name: Application Categories
 - name: Applications
 - name: Audit Logs
 - name: Claim
-- name: Components
 - name: Composite Source Control
 - name: Composite Source Control Config Validator
 - name: Config
@@ -7980,7 +7978,6 @@ tags:
 - name: Config Reverse Proxy Authentication
 - name: Config SAML
 - name: Config Source Control
-- name: CycloneDX
 - name: Data Retention Policies
 - name: Endpoints
 - name: Firewall
@@ -7988,7 +7985,6 @@ tags:
 - name: License Legal Metadata
 - name: Organizations
 - name: Policies
-- name: Policy Evaluation
 - name: Policy Violations
 - name: Policy Waiver
 - name: Policy Waivers
