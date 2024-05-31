@@ -59,8 +59,8 @@ jobs:
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "<>"
             - name: Unstage all existing files
-              run: |
-                  git rm -fr --ignore-unmatch *
+              run: git rm -fr --ignore-unmatch *
+              working-directory: out/go
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
