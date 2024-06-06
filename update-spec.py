@@ -259,6 +259,9 @@ if 'paths' in json_spec:
                 for method in methods:
                     json_spec['paths'][path].pop(method)
 
+# v176 Updates
+# ------------------------------------------------------------------------
+
 # Remove duplicated tags
 # As of 176, some tags are added additionally with descriptions
 if 'tags' in json_spec:
@@ -270,6 +273,29 @@ if 'tags' in json_spec:
             tags_seen.append(tag['name'])
             unique_tags.append(tag)
     json_spec['tags'] = unique_tags
+
+# v177 Updates
+# ------------------------------------------------------------------------
+
+# Fix schema with name 'SBOM vulnerability analysis request':
+SCHEMA_NAMES_TO_UPDATE = {
+    'SBOM vulnerability analysis request': 'SBOMVulnerabilityAnalysisRequest'
+}
+for schema_to_fix in SCHEMA_NAMES_TO_UPDATE:
+    print(f'Replacing Schema {schema_to_fix} with {SCHEMA_NAMES_TO_UPDATE[schema_to_fix]}',)
+    schema_content = json_spec['components']['schemas'].pop(schema_to_fix, None)
+    json_spec['components']['schemas'][SCHEMA_NAMES_TO_UPDATE[schema_to_fix]] = schema_content
+
+    print(f'   Updating any paths using {schema_to_fix}...')
+    ref_to_find = f'#/components/schemas/{schema_to_fix}'
+    ref_to_replace_with= f'#/components/schemas/{SCHEMA_NAMES_TO_UPDATE[schema_to_fix]}'
+    for path in json_spec['paths']:
+        for method in json_spec['paths'][path]:
+            if 'requestBody' in json_spec['paths'][path][method]:
+                for content_type in json_spec['paths'][path][method]['requestBody']['content']:
+                    if '$ref' in json_spec['paths'][path][method]['requestBody']['content'][content_type]['schema']:
+                        if json_spec['paths'][path][method]['requestBody']['content'][content_type]['schema']['$ref'] == ref_to_find:
+                            json_spec['paths'][path][method]['requestBody']['content'][content_type]['schema']['$ref'] = ref_to_replace_with
 
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
