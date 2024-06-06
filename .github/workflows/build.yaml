@@ -92,8 +92,8 @@ jobs:
         - name: Install test dependencies & run generated tests
           run: |
             python -m pip install --upgrade pip
-            poetry install
             pip install flake8 pytest
+            poetry install
             pytest
           working-directory: out/python
 
