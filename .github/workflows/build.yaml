@@ -93,6 +93,7 @@ jobs:
           run: |
             python -m pip install --upgrade pip
             poetry install
+            pip install flake8 pytest
             pytest
           working-directory: out/python
 
