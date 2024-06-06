@@ -2989,7 +2989,7 @@ components:
         versionRange:
           type: string
       type: object
-    SBOM vulnerability analysis request:
+    SBOMVulnerabilityAnalysisRequest:
       properties:
         componentLocator:
           $ref: '#/components/schemas/componentLocator'
@@ -7457,7 +7457,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SBOM vulnerability analysis request'
+              $ref: '#/components/schemas/SBOMVulnerabilityAnalysisRequest'
         description: Vulnerability analysis details with component information
         required: true
       responses:
