@@ -32,10 +32,11 @@ projects.
 
 ## Supported Languages & Frameworks
 
-| Language / Framework | Sonatype IQ Version Added | Public Package Link                                                                                                                   |
-|----------------------|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| Golang / Go | 164 | [![go.dev reference](https://img.shields.io/badge/dynamic/json?color=blue&label=tag&query=name&url=https://api.razonyang.com/v1/github/tag/sonatype-nexus-community/nexus-iq-api-client-go)](https://pkg.go.dev/github.com/sonatype-nexus-community/nexus-iq-api-client-go) |
-| Typescript (fetch)   | 156                       | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fnexus-iq-api-client)](https://www.npmjs.com/package/@sonatype/nexus-iq-api-client) |
+| Language / Framework | Sonatype IQ Version Added | Public Package Link                                                                                                                                                                                                                                                         |
+|----------------------|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Golang / Go          | 164                       | [![go.dev reference](https://img.shields.io/badge/dynamic/json?color=blue&label=tag&query=name&url=https://api.razonyang.com/v1/github/tag/sonatype-nexus-community/nexus-iq-api-client-go)](https://pkg.go.dev/github.com/sonatype-nexus-community/nexus-iq-api-client-go) |
+| Python               | 177                       | [![pypi](https://img.shields.io/pypi/v/sonatype-iq-api-client)](https://pypi.org/project/sonatype-iq-api-client/)                                                                                                                                                                                                                                                               |
+| Typescript (fetch)   | 156                       | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fnexus-iq-api-client)](https://www.npmjs.com/package/@sonatype/nexus-iq-api-client)                                                                                                                                       |
 
 ## Known Issues
 
@@ -77,9 +78,13 @@ docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli generate -
 
 ## Diagnosing Responses that are not Schema Compliant
 
-In the rare event that Sonatype IQ Server provides a response that does not validate against the schema (our patched schema to be clear), things can be silent - you just never get a response in your code.
+In the rare event that Sonatype IQ Server provides a response that does not validate against the schema (our patched
+schema to be clear), things can be silent - you just never get a response in your code.
 
-Through the use of [Postman](https://www.postman.com) and [opeapi-request-response-validation](https://github.com/gcatanese/openapi-request-response-validation) project by [Beppe Catanese](https://github.com/gcatanese), we can quickly and accurately see where response validation failures occur.
+Through the use of [Postman](https://www.postman.com)
+and [opeapi-request-response-validation](https://github.com/gcatanese/openapi-request-response-validation) project
+by [Beppe Catanese](https://github.com/gcatanese), we can quickly and accurately see where response validation failures
+occur.
 
 1. Configure the request for which you are not getting a response in Postman exactly as it was sent
 2. To that request (you can do this in a Collection if you are using Collections too), add a Test with the code:
@@ -131,9 +136,10 @@ Through the use of [Postman](https://www.postman.com) and [opeapi-request-respon
    ```
    docker run -p 8080:8080 -v ./spec:/openapi -it --rm gcatanese/openapi-request-response-validation
    ```
-4. Execute the request in Postman - if the test does not show as passed then you can get details of the failure from two places:  
-   1. The Postman console
-   2. The logs from the running Container 
+4. Execute the request in Postman - if the test does not show as passed then you can get details of the failure from two
+   places:
+    1. The Postman console
+    2. The logs from the running Container
 
 ## Changelog
 
