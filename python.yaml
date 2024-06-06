@@ -4,4 +4,4 @@ generatorName: python
 additionalProperties:
   library: urllib3
   packageName: "sonatype_iq_api_client"
-  projectName: "Sonatype IQ API Client"
+  projectName: "sonatype-iq-api-client"
