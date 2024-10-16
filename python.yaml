@@ -3,5 +3,8 @@ outputDir: /local/out/python
 generatorName: python
 additionalProperties:
   library: urllib3
+  infoEmail: "community@sonatype.com"
+  infoName: "Sonatype Community"
+  licenseInfo: "Apache-2.0"
   packageName: "sonatype_iq_api_client"
   projectName: "sonatype-iq-api-client"
