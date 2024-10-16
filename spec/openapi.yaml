@@ -396,6 +396,8 @@ components:
       type: object
     ApiComponentRemediationValueDTO:
       properties:
+        suggestedVersionChange:
+          $ref: '#/components/schemas/ApiSuggestedVersionChangeOptionDTO'
         versionChanges:
           items:
             $ref: '#/components/schemas/ApiVersionChangeOptionDTO'
@@ -1018,6 +1020,13 @@ components:
         licenseThreatGroupName:
           type: string
       type: object
+    ApiLicensedSolutionDTO:
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+      type: object
     ApiMailConfigurationDTO:
       properties:
         hostname:
@@ -1279,6 +1288,8 @@ components:
           type: string
         policyWaiverId:
           type: string
+        reasonText:
+          type: string
         scopeOwnerId:
           type: string
         scopeOwnerName:
@@ -1289,6 +1300,15 @@ components:
           format: int32
           type: integer
         vulnerabilityId:
+          type: string
+      type: object
+    ApiPolicyWaiverReasonDTO:
+      properties:
+        id:
+          type: string
+        reasonText:
+          type: string
+        type:
           type: string
       type: object
     ApiPolicyWaiversApplicableToViolationDTO:
@@ -1832,21 +1852,6 @@ components:
         validateResponseSignature:
           type: boolean
       type: object
-    ApiSbomApplicationsHistoryMetricDTO:
-      properties:
-        applicationsUpdatedLastMonth:
-          format: int64
-          type: integer
-        applicationsUpdatedLastWeek:
-          format: int64
-          type: integer
-        applicationsUpdatedLastYear:
-          format: int64
-          type: integer
-        totalScannedApplications:
-          format: int64
-          type: integer
-      type: object
     ApiSbomStatusDTO:
       properties:
         applicationId:
@@ -2169,6 +2174,28 @@ components:
         maxAge:
           type: string
       type: object
+    ApiSuggestedVersionChangeOptionDTO:
+      properties:
+        data:
+          $ref: '#/components/schemas/ApiComponentChangeActionDTO'
+        directDependency:
+          type: boolean
+        directDependencyData:
+          items:
+            $ref: '#/components/schemas/ApiComponentChangeActionDTO'
+          type: array
+        isGolden:
+          type: boolean
+        type:
+          enum:
+          - next-no-violations
+          - next-non-failing
+          - next-no-violations-with-dependencies
+          - next-non-failing-with-dependencies
+          - recommended-non-breaking
+          - recommended-non-breaking-with-dependencies
+          type: string
+      type: object
     ApiTagDTO:
       properties:
         color:
@@ -2270,12 +2297,20 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/ApiComponentChangeActionDTO'
+        directDependency:
+          type: boolean
+        directDependencyData:
+          items:
+            $ref: '#/components/schemas/ApiComponentChangeActionDTO'
+          type: array
         type:
           enum:
           - next-no-violations
           - next-non-failing
           - next-no-violations-with-dependencies
           - next-non-failing-with-dependencies
+          - recommended-non-breaking
+          - recommended-non-breaking-with-dependencies
           type: string
       type: object
     ApiWaivedPolicyViolationDTO:
@@ -2311,6 +2346,8 @@ components:
           - EXACT_COMPONENT
           - ALL_COMPONENTS
           - ALL_VERSIONS
+          type: string
+        waiverReasonId:
           type: string
       type: object
     ApplicableContext:
@@ -2915,6 +2952,9 @@ components:
         criticalPolicyViolationCount:
           format: int32
           type: integer
+        criticalSastPolicyViolationCount:
+          format: int32
+          type: integer
         grandfatheredPolicyViolationCount:
           format: int32
           type: integer
@@ -2927,13 +2967,26 @@ components:
         moderatePolicyViolationCount:
           format: int32
           type: integer
+        moderateSastPolicyViolationCount:
+          format: int32
+          type: integer
+        sastAlerts:
+          items:
+            $ref: '#/components/schemas/PolicyAlert'
+          type: array
         severeComponentCount:
           format: int32
           type: integer
         severePolicyViolationCount:
           format: int32
           type: integer
+        severeSastPolicyViolationCount:
+          format: int32
+          type: integer
         totalComponentCount:
+          format: int32
+          type: integer
+        totalSastFindingCount:
           format: int32
           type: integer
       type: object
@@ -3047,15 +3100,6 @@ components:
           type: array
         totalResultsCount:
           format: int32
-          type: integer
-      type: object
-    SbomsAnalyzedMetricsDTO:
-      properties:
-        threshold:
-          format: int64
-          type: integer
-        total:
-          format: int64
           type: integer
       type: object
     SearchResultDTO:
@@ -3174,6 +3218,8 @@ components:
         description:
           type: string
         detectionMarkdown:
+          type: string
+        detectionType:
           type: string
         explanationMarkdown:
           type: string
@@ -3336,6 +3382,7 @@ components:
         type:
           enum:
           - SECURITY_VULNERABILITY_REFID
+          - SAST_FINDING_ID
           type: string
         value:
           type: string
@@ -3346,54 +3393,6 @@ components:
           type: string
         valid:
           type: boolean
-      type: object
-    VulnerabilitiesThreadLevelMetricDTO:
-      properties:
-        critical:
-          format: int64
-          type: integer
-        criticalAnnotated:
-          format: int64
-          type: integer
-        criticalUnannotated:
-          format: int64
-          type: integer
-        high:
-          format: int64
-          type: integer
-        highAnnotated:
-          format: int64
-          type: integer
-        highUnannotated:
-          format: int64
-          type: integer
-        low:
-          format: int64
-          type: integer
-        lowAnnotated:
-          format: int64
-          type: integer
-        lowUnannotated:
-          format: int64
-          type: integer
-        medium:
-          format: int64
-          type: integer
-        mediumAnnotated:
-          format: int64
-          type: integer
-        mediumUnannotated:
-          format: int64
-          type: integer
-        totalVulnerabilities:
-          format: int64
-          type: integer
-        totalVulnerabilitiesAnnotated:
-          format: int64
-          type: integer
-        totalVulnerabilitiesUnannotated:
-          format: int64
-          type: integer
       type: object
     VulnerabilitySource:
       properties:
@@ -3476,85 +3475,117 @@ components:
       type: http
 info:
   title: Sonatype Lifecycle Public REST API
-  version: 1.177.0-01
+  version: 1.182.0-01
 openapi: 3.0.1
 paths:
   /api/v2/applicationCategories/application:
     get:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to retrieve a list of application
+        categories.
       operationId: getTagsUsedByApplications
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/ApiApplicationCategoryDTO'
                 type: array
-          description: default response
+          description: A list of application categories or tags applied to applications.
+            Each application category or tag consists of an id, name, description
+            and color.
       tags:
       - Application Categories
   /api/v2/applicationCategories/application/{applicationPublicId}:
     get:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to retrieve a list of application
+        categories available to applications in this organization.
       operationId: getApplicationApplicableTags
       parameters:
-      - in: path
+      - description: 'The application public ID '
+        in: path
         name: applicationPublicId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicableTagsDTO'
-          description: default response
+          description: 'A list of application categories that can be applied to the
+            specified application. Each application category or tag consists of an
+            id, name, description and color. '
       tags:
       - Application Categories
   /api/v2/applicationCategories/application/{applicationPublicId}/applicable:
     get:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to retrieve a list of application
+        categories that can be applied to applications in this organization.
       operationId: getApplicableTagsByApplicationPublicId
       parameters:
-      - in: path
+      - description: Provide the application public ID assigned by IQ Server.
+        in: path
         name: applicationPublicId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/ApiApplicationCategoryDTO'
                 type: array
-          description: default response
+          description: Returns all application categories or tags that can be applied
+            to this application,  by providing the application public ID.
       tags:
       - Application Categories
   /api/v2/applicationCategories/organization/{organizationId}:
     get:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to retrieve a list of application
+        categories in use by applications in this organization.
       operationId: getTags
       parameters:
-      - in: path
+      - description: The organizationId assigned by IQ Server.
+        in: path
         name: organizationId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/ApiApplicationCategoryDTO'
                 type: array
-          description: default response
+          description: 'A list of application categories or tags that can be used
+            by applications in this organization. Each application category consists
+            of an id, name, description and color. '
       tags:
       - Application Categories
     post:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to add a new application category
+        or tag.
       operationId: addTag
       parameters:
-      - in: path
+      - description: The organizationId assigned by IQ Server, for which you want
+          to create the application category.
+        in: path
         name: organizationId
         required: true
         schema:
@@ -3564,19 +3595,29 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApiApplicationCategoryDTO'
+        description: Specify the the name, description and color for the new application
+          category to be  created. The application category id is not required to
+          create a new application category  and should not be included.
+        required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiApplicationCategoryDTO'
-          description: default response
+          description: Successful creation of the new application category and its
+            details.
       tags:
       - Application Categories
     put:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to update an existing application
+        category.
       operationId: updateTag
       parameters:
-      - in: path
+      - description: The organizationId assigned by IQ Server.
+        in: path
         name: organizationId
         required: true
         schema:
@@ -3586,90 +3627,121 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApiApplicationCategoryDTO'
+        description: Specify the id (application category id) and id of the organization
+          that owns this  application category, to update the name, description and
+          color.
+        required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiApplicationCategoryDTO'
-          description: default response
+          description: Successful update echoing the updated application category
+            details.
       tags:
       - Application Categories
   /api/v2/applicationCategories/organization/{organizationId}/applicable:
     get:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to retrieve a list of application
+        categories that can be applied to applications in this organization.
       operationId: getApplicableTags
       parameters:
-      - in: path
+      - description: The organizationId assigned by IQ Server, for which you want
+          to retrieve the applicable tags or application categories.
+        in: path
         name: organizationId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicableTagsDTO'
-          description: default response
+          description: 'A list of application categories or tags that can be applied
+            to applications in this organization. Each application category or tag
+            consists of an id, name, description and color. '
       tags:
       - Application Categories
   /api/v2/applicationCategories/organization/{organizationId}/applied:
     get:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to retrieve a list of application
+        categories that can be applied to applications in this organization.
       operationId: getAppliedTags
       parameters:
-      - in: path
+      - description: The organizationId assigned by IQ Server.
+        in: path
         name: organizationId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppliedTagsDTO'
-          description: default response
+          description: Get all application categories or tags that can be applied
+            to an application, belonging to the organization specified by the organization
+            id.
       tags:
       - Application Categories
   /api/v2/applicationCategories/organization/{organizationId}/policy:
     get:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to retrieve a list of application
+        categories that are applied to applications in this organization.
       operationId: getAppliedPolicyTags
       parameters:
-      - in: path
+      - description: The organizationId assigned by IQ Server.
+        in: path
         name: organizationId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/PolicyTag'
                 type: array
-          description: default response
+          description: Get all policy application categories or tags that are applied
+            to applications  in this organization.
       tags:
       - Application Categories
   /api/v2/applicationCategories/organization/{organizationId}/{tagId}:
     delete:
+      description: Grouping applications with similar characteristics into categories
+        makes policy management easier. You can then create a policy that applies
+        to a specific category. Use this method to update an existing application
+        category.Use this method to delete an existing application category.
       operationId: deleteTag
       parameters:
-      - in: path
+      - description: The organizationId assigned by IQ Server, corresponding to the
+          application category tag you want to delete.
+        in: path
         name: organizationId
         required: true
         schema:
           type: string
-      - in: path
+      - description: The application category ID assigned by IQ Server, to be deleted.
+        in: path
         name: tagId
         required: true
         schema:
           type: string
       responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
+        '204':
+          description: Successful deletion of the application category.
       tags:
       - Application Categories
   /api/v2/applications:
@@ -3811,48 +3883,79 @@ paths:
       - Applications
   /api/v2/applications/{applicationPublicId}/reports/policyViolations/diff:
     get:
+      description: 'By configuring Lifecycle with SCM, policy evaluations can be linked
+        to the Git commit hash. Use this method to compare the violations between
+        policy evaluations for 2 commits, by providing the linked commit hashes.
+
+
+        Permissions required: View IQ Elements'
       operationId: getPolicyViolationDiff
       parameters:
-      - in: path
+      - description: Enter the applicationPublicId, created at the time of creating
+          the application
+        in: path
         name: applicationPublicId
         required: true
         schema:
           type: string
-      - in: query
+      - description: Enter the commit hash linked to the earlier policy evaluation.
+        in: query
         name: fromCommit
+        required: true
         schema:
           type: string
-      - in: query
+      - description: Enter the commit hash linked to the other (later) policy evaluation
+          to compare.
+        in: query
         name: toCommit
+        required: true
         schema:
           type: string
-      - in: query
+      - description: Enter the policy evaluation Id linked to the earlier policy evaluation
+          to compare
+        in: query
         name: fromPolicyEvaluationId
         schema:
           type: string
-      - in: query
+      - description: Enter the policy evaluation Id linked to the other (later) policy
+          evaluation to compare
+        in: query
         name: toPolicyEvaluationId
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiPolicyViolationDiffDTO'
-          description: default response
+          description: The response contains the violation details grouped under addedViolations,
+            sameViolations and removedViolations for the two policy evaluations being
+            compared.
+        '400':
+          description: Missing or invalid parameter. Check if the policy evaluations
+            are still available, based on the Data Retention Policies.
+        '404':
+          description: Policy violation diff could not be determined for the given
+            request.
       tags:
-      - Applications
+      - Application Report Data
   /api/v2/applications/{applicationPublicId}/reports/{scanId}:
     get:
+      description: This is an older version of the endpoint. This call will now be
+        redirected to /api/v2/applications/{applicationPublicId}/reports/{scanId}/raw
+        (see below)
       operationId: getData
       parameters:
-      - in: path
+      - description: Enter the applicationPublicId for the evaluated application.
+        in: path
         name: applicationPublicId
         required: true
         schema:
           type: string
-      - in: path
+      - description: 'Enter the scanId (reportId) of the application report created
+          after the evaluation. '
+        in: path
         name: scanId
         required: true
         schema:
@@ -3863,76 +3966,119 @@ paths:
             '*/*': {}
           description: default response
       tags:
-      - Applications
+      - Application Report Data
   /api/v2/applications/{applicationPublicId}/reports/{scanId}/dependencyTree:
     get:
+      description: 'Use this method to retrieve the dependencies related to the component
+        identified at the time of application evaluation. This is currently available
+        only for Java (Maven) and NPM applications.
+
+
+        Permissions required: View IQ Elements'
       operationId: getDependencyTree
       parameters:
-      - in: path
+      - description: Enter the applicationPublicId created at the time of creating
+          the application.
+        in: path
         name: applicationPublicId
         required: true
         schema:
           type: string
-      - in: path
+      - description: ' Enter the reportId (scanId) created at the time of evaluating
+          the application.'
+        in: path
         name: scanId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiDependencyTreeResponseDTO'
-          description: default response
+          description: The response fields contain the 'Dependency Tree' data  under
+            the 'children' section. The 'children' section may contain more tree nodes.
+            Every direct dependency can have zero or more transitive dependencies.
+            Each tree node contains the packageUrl, component identifier and a dependency
+            tree node (if it exists.) The component identifier section contains the
+            format and coordinates for the component.
+        '400':
+          description: Missing or invalid parameter.
+        '404':
+          description: The requested dependency tree was not found.
       tags:
-      - Applications
+      - Application Report Data
   /api/v2/applications/{applicationPublicId}/reports/{scanId}/policy:
     get:
+      description: 'Use this method to retrieve the policy violation data generated
+        as a result of an application evaluation, for each component identified in
+        the application evaluation./n/nPermissions required: View IQ Elements'
       operationId: getPolicyViolations_1
       parameters:
-      - in: path
+      - description: Enter the applicationPublicId created at the time of creating
+          the application.
+        in: path
         name: applicationPublicId
         required: true
         schema:
           type: string
-      - in: path
+      - description: Enter the reportId (scanId) created at the time of evaluating
+          the application.
+        in: path
         name: scanId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiReportPolicyDataDTOV2'
-          description: default response
+          description: The response fields contain the policy violation data for the
+            reportId (scanId) specified in the method call. The fields corresponding
+            to 'violations' include the violation details for each policy, for the
+            component.
       tags:
-      - Applications
+      - Application Report Data
   /api/v2/applications/{applicationPublicId}/reports/{scanId}/raw:
     get:
+      description: 'Use this method to retrieve the ''raw'' data generated as a result
+        of an application evaluation. ''raw'' data includes: the components identified
+        in the application, and the licenses and vulnerabilities associated with the
+        identified components./n/nPermissions required: View IQ Elements'
       operationId: getRawData
       parameters:
-      - in: path
+      - description: 'Enter the applicationPublicId (assigned at the time of creating
+          a new application.) '
+        in: path
         name: applicationPublicId
         required: true
         schema:
           type: string
-      - in: path
+      - description: Enter the reportId (scanId) created at the time of evaluating
+          the application. application.
+        in: path
         name: scanId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiReportRawDataDTOV2'
-          description: default response
+          description: The response fields contain the 'raw' data for the reportId
+            (scanId) specified in the method call. The fields corresponding to 'dependencyData'
+            will indicate if the component is a direct dependency (true/false), an
+            InnerSource component(true/false), the associated parentComponentPurls
+            (package URLs of the parent component ownerApplicationName (name of the
+            owner application), ownerApplicatonId (internal ID of the owner application,
+            innerSourceComponentPurl (the package URL of the InnerSourceComponent.)
       tags:
-      - Applications
+      - Application Report Data
   /api/v2/applications/{sourceApplicationId}/clone:
     post:
       operationId: cloneApplication
@@ -4115,6 +4261,13 @@ paths:
         name: scanId
         schema:
           type: string
+      - description: Enter true if you want to include parent remediation for transitive
+          dependency in the response based on your application policy scan.
+        in: query
+        name: includeParentRemediation
+        schema:
+          default: false
+          type: boolean
       requestBody:
         content:
           application/json:
@@ -4959,12 +5112,12 @@ paths:
         required: true
         schema:
           type: string
-      - description: Possible values are 1.1|1.2|1.3|1.4|1.5.
+      - description: Possible values are 1.1|1.2|1.3|1.4|1.5|1.6.
         in: path
         name: cdxVersion
         required: true
         schema:
-          pattern: 1.1|1.2|1.3|1.4|1.5
+          pattern: 1.1|1.2|1.3|1.4|1.5|1.6
           type: string
       responses:
         '200':
@@ -4996,12 +5149,12 @@ paths:
         required: true
         schema:
           type: string
-      - description: Possible values are 1.1|1.2|1.3|1.4|1.5.
+      - description: Possible values are 1.1|1.2|1.3|1.4|1.5|1.6.
         in: path
         name: cdxVersion
         required: true
         schema:
-          pattern: 1.1|1.2|1.3|1.4|1.5
+          pattern: 1.1|1.2|1.3|1.4|1.5|1.6
           type: string
       responses:
         '200':
@@ -6244,72 +6397,124 @@ paths:
       - Policies
   /api/v2/policyViolations:
     get:
+      description: 'Use this method to retrieve policy violation details for a policy/policies.
+        You will need the policyId(s) to retrieve the policy violations details. policyId
+        is available as the response field of the Policies REST API.
+
+
+        Permissions required: View IQ Elements'
       operationId: getPolicyViolations
       parameters:
-      - in: query
+      - description: Enter the policyIds to obtain the corresponding violation details
+        in: query
         name: p
+        required: true
         schema:
           items:
             type: string
           type: array
           uniqueItems: true
-      - in: query
+      - description: Enter the date (format YYYY-MM-DD) from which you want to retrieve
+          the violation details
+        in: query
         name: openTimeAfter
         schema:
           type: string
-      - in: query
+      - description: Enter the date (format YYYY-MM-DD) until which you want to retrieve
+          the violation details
+        in: query
         name: openTimeBefore
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiApplicationViolationListDTOV2'
-          description: default response
+          description: The response contains the details of the application that violates
+            the policy/policies and violation details grouped under the policyIds
+            provided. `openTime` indicates the date and time when the violation was
+            first detected. `reference` is the reference data that triggered the violation.
       tags:
-      - Policy Violations
+      - Policy Violation Details
   /api/v2/policyViolations/crossStage:
     get:
+      description: 'A cross-stage policy violation represents an aggregate of all
+        violations of a policy  occurring across multiple stages of an application.
+        Cross-stage policy violations are helpful in performance analysis by determining
+        the time taken to remediate a violation across all stages where it was detected.
+
+        Use this method to retrieve all cross-stage violations, irrespective of the
+        time they were detected.
+
+
+        Permissions required: View IQ Elements'
       operationId: getCrossStagePolicyViolationByConstituentId
       parameters:
-      - in: query
+      - description: Enter the violationId. Use the GET method described for the endpoint
+          /api/v2/policyViolations to obtain the policy violationId.
+        in: query
         name: constituentId
+        required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiCrossStageViolationDTOV2'
-          description: default response
+          description: The response contains violation details for all occurrences
+            of the same policy violation, across multiple stages. stageData indicates
+            the name of the stages where the violation occurred, the scanId/reportId
+            when it was reported and the policy action triggered due to the violation.
       tags:
-      - Policy Violations
+      - Policy Violation Details
   /api/v2/policyViolations/crossStage/{violationId}:
     get:
+      description: 'A cross-stage policy violation represents an aggregate of all
+        violations of the same policy, occurring at multiple stages for an application.
+        Cross-stage policy violations are helpful in performance analysis by determining
+        the time taken to remediate a violation across all stages where it was detected.
+
+        Use this method to retrieve cross-stage policy violations.
+
+
+        Permissions required: View IQ Elements'
       operationId: getCrossStagePolicyViolationById
       parameters:
-      - in: path
+      - description: 'Enter the policy `violationId`. Use the GET method described
+          for the endpoint /api/v2/policyViolations to obtain the policy violationId. '
+        in: path
         name: violationId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiCrossStageViolationDTOV2'
-          description: default response
+          description: The response contains violation details for all occurrences
+            of the same policy violation across multiple stages. `stageData` indicates
+            the name of the stages where the violationoccurred, and `reportId` where
+            it was reported and the policy action triggered due to the violation.
       tags:
-      - Policy Violations
+      - Policy Violation Details
   /api/v2/policyViolations/transitive/{ownerType}/{ownerId}/stages/{stageId}:
     get:
+      description: 'Use this method to obtain all transitive policy violations for
+        a given component in  a specific stage. Transitive policy violations are violations
+        caused by transitive dependencies.
+
+
+        Permissions required: View IQ Elements'
       operationId: getTransitivePolicyViolationsByOwnerStageComponent
       parameters:
-      - in: path
+      - description: Possible values are 'application' or 'organization'
+        in: path
         name: ownerType
         required: true
         schema:
@@ -6322,42 +6527,62 @@ paths:
           - global
           pattern: application|organization
           type: string
-      - in: path
+      - description: Possible values are applicationId, organizationId
+        in: path
         name: ownerId
         required: true
         schema:
           type: string
-      - in: path
+      - description: Possible values are 'develop', 'source', 'build', 'stage-release',
+          'release', and, 'operate'.
+        in: path
         name: stageId
         required: true
         schema:
           type: string
-      - in: query
+      - description: Enter the component identifier and the coordinates of the component
+          for which you want to obtain the transitive violations. This is optional,
+          not required if package URL or hash value is provided.
+        in: query
         name: componentIdentifier
         schema:
           $ref: '#/components/schemas/ComponentIdentifier'
-      - in: query
+      - description: Enter the package URL of the component. This is optional, not
+          required if component identifier or hash value is provided.
+        in: query
         name: packageUrl
         schema:
           type: string
-      - in: query
+      - description: Enter the hash value of the component. This is optional, not
+          required if component identifier or package URL is provided.
+        in: query
         name: hash
         schema:
           type: string
       responses:
-        default:
+        '204':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiComponentTransitivePolicyViolationsDTO'
-          description: default response
+          description: The response contains all transitive violations detected for
+            the component specified. In addition to the policy violation details like
+            the name/id of the policy violated, threat level threat category, etc.
+            the response also indicates if the violation is due to an 'InnerSource'
+            component.
       tags:
-      - Policy Violations
+      - Policy Violation Details
   /api/v2/policyViolations/transitive/{ownerType}/{ownerId}/{scanId}:
     get:
+      description: 'Use this method to retrieve transitive policy violations for a
+        given component in a specific scan.
+
+
+        Permissions required: View IQ Elements'
       operationId: getTransitivePolicyViolationsByAppScanComponent
       parameters:
-      - in: path
+      - description: Enter the scope for this violation. Possible values are 'application'
+        in: path
         name: ownerType
         required: true
         schema:
@@ -6370,279 +6595,92 @@ paths:
           - global
           pattern: application
           type: string
-      - in: path
+      - description: Enter the identifier for the scope specified above. E.g. applicationId
+        in: path
         name: ownerId
         required: true
         schema:
           type: string
-      - in: path
+      - description: Enter the scanId/reportId corresponding to the scan.
+        in: path
         name: scanId
         required: true
         schema:
           type: string
-      - in: query
+      - description: Enter the component identifier and the coordinates of the component
+          for which you want to retrieve the transitive policy violations. This is
+          optional, not required if package URL or hash value is provided.
+        in: query
         name: componentIdentifier
         schema:
           $ref: '#/components/schemas/ComponentIdentifier'
-      - in: query
+      - description: Enter the package URL for the component for which you want to
+          retrieve the transitive policy violations in the specific scan.
+        in: query
         name: packageUrl
         schema:
           type: string
-      - in: query
+      - description: Enter the hash value for the component for which you want to
+          retrieve the transitive policy violations in the specific scan.
+        in: query
         name: hash
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiComponentTransitivePolicyViolationsDTO'
-          description: default response
+          description: The response contains violation details for all transitive
+            violations occurring in the scan specified. The response also indicates
+            if the violation is due to an 'InnerSource' component.
       tags:
-      - Policy Violations
+      - Policy Violation Details
   /api/v2/policyViolations/{violationId}/applicableWaivers:
     get:
+      description: 'Use this method to obtain all existing waivers that are applicable
+        to a policy violation. A waiver is considered as ''applicable'' if it matches
+        the following conditions:<ul><li>The policyId for the policy violation matches
+        the policyId associated with the waiver</li><li>The violated policy conditions
+        match the policy conditions of the waiver/li><li>The waiver scope matches
+        the violating component</li></ul>
+
+
+        Permissions required: View IQ Elements'
       operationId: getApplicableWaivers
       parameters:
-      - in: path
+      - description: Enter the policy violationId for which you want to obtain the
+          applicable waivers.
+        in: path
         name: violationId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiPolicyWaiversApplicableToViolationDTO'
-          description: default response
+          description: 'The response contains details for all applicable waivers for
+            the `violationId` specified. It is grouped under ''activeWaivers'' and
+            ''expiredWaivers''. `scope` indicates the scope of the applicable waiver.
+            Possible values for the enum field `matcherStrategy` are EXACT_COMPONENT,
+            ALL_COMPONENTS, ALL_VERSIONS).
+
+
+            `reference` shows the reference data that triggered the violation. `componentUpgradeAvailable`
+            indicates if a non-violating version of the component is available to
+            remediate the violation.'
       tags:
-      - Policy Violations
-  /api/v2/policyWaiver/{policyViolationId}/{ownerType}:
-    post:
-      deprecated: true
-      operationId: addPolicyWaiver
-      parameters:
-      - in: path
-        name: policyViolationId
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: ownerType
-        required: true
-        schema:
-          enum:
-          - application
-          - organization
-          - repository_container
-          - repository_manager
-          - repository
-          - global
-          pattern: application|organization
-          type: string
-      requestBody:
-        content:
-          text/plain:
-            schema:
-              type: string
-      responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
-      tags:
-      - Policy Waiver
-  /api/v2/policyWaivers/transitive/{ownerType}/{ownerId}/stages/{stageId}:
-    post:
-      operationId: addWaiverToTransitivePolicyViolationsByOwnerStageComponent
-      parameters:
-      - in: path
-        name: ownerType
-        required: true
-        schema:
-          enum:
-          - application
-          - organization
-          - repository_container
-          - repository_manager
-          - repository
-          - global
-          pattern: application|organization
-          type: string
-      - in: path
-        name: ownerId
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: stageId
-        required: true
-        schema:
-          type: string
-      - in: query
-        name: componentIdentifier
-        schema:
-          $ref: '#/components/schemas/ComponentIdentifier'
-      - in: query
-        name: packageUrl
-        schema:
-          type: string
-      - in: query
-        name: hash
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApiWaiverOptionsDTO'
-      responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
-      tags:
-      - Policy Waivers
-  /api/v2/policyWaivers/transitive/{ownerType}/{ownerId}/{scanId}:
+      - Policy Violation Details
+  /api/v2/policyViolations/{violationId}/similarWaivers:
     get:
-      operationId: getTransitivePolicyWaiversByAppScanComponent
+      operationId: getSimilarWaivers
       parameters:
       - in: path
-        name: ownerType
-        required: true
-        schema:
-          enum:
-          - application
-          - organization
-          - repository_container
-          - repository_manager
-          - repository
-          - global
-          pattern: application
-          type: string
-      - in: path
-        name: ownerId
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: scanId
-        required: true
-        schema:
-          type: string
-      - in: query
-        name: componentIdentifier
-        schema:
-          $ref: '#/components/schemas/ComponentIdentifier'
-      - in: query
-        name: packageUrl
-        schema:
-          type: string
-      - in: query
-        name: hash
-        schema:
-          type: string
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiComponentPolicyWaiversDTO'
-          description: default response
-      tags:
-      - Policy Waivers
-    post:
-      operationId: addWaiverToTransitivePolicyViolationsByAppScanComponent
-      parameters:
-      - in: path
-        name: ownerType
-        required: true
-        schema:
-          enum:
-          - application
-          - organization
-          - repository_container
-          - repository_manager
-          - repository
-          - global
-          pattern: application
-          type: string
-      - in: path
-        name: ownerId
-        required: true
-        schema:
-          type: string
-      - in: path
-        name: scanId
-        required: true
-        schema:
-          type: string
-      - in: query
-        name: componentIdentifier
-        schema:
-          $ref: '#/components/schemas/ComponentIdentifier'
-      - in: query
-        name: packageUrl
-        schema:
-          type: string
-      - in: query
-        name: hash
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApiWaiverOptionsDTO'
-      responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
-      tags:
-      - Policy Waivers
-  /api/v2/policyWaivers/waiverRequests/{policyViolationId}:
-    post:
-      operationId: requestPolicyWaiver
-      parameters:
-      - in: path
-        name: policyViolationId
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApiRequestPolicyWaiverDTO'
-      responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
-      tags:
-      - Policy Waivers
-  /api/v2/policyWaivers/{ownerType}/{ownerId}:
-    get:
-      operationId: getPolicyWaivers
-      parameters:
-      - in: path
-        name: ownerType
-        required: true
-        schema:
-          enum:
-          - application
-          - organization
-          - repository_container
-          - repository_manager
-          - repository
-          - global
-          pattern: application|organization|repository|repository_manager|repository_container
-          type: string
-      - in: path
-        name: ownerId
+        name: violationId
         required: true
         schema:
           type: string
@@ -6656,12 +6694,283 @@ paths:
                 type: array
           description: default response
       tags:
-      - Policy Waivers
-  /api/v2/policyWaivers/{ownerType}/{ownerId}/{policyViolationId}:
+      - Policy Violation Details
+  /api/v2/policyWaiverReasons:
+    get:
+      operationId: getPolicyWaiverReasons
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiPolicyWaiverReasonDTO'
+                type: array
+          description: default response
+      tags:
+      - Policy Waiver Reasons
+  /api/v2/policyWaivers/transitive/{ownerType}/{ownerId}/stages/{stageId}:
     post:
-      operationId: addPolicyWaiverByPolicyViolationId
+      description: 'Use this method to add a waiver for all transitive violations
+        for a given component, detected in the latest scan at the stage specified.
+
+
+        Permissions required: Waive Policy Violations'
+      operationId: addWaiverToTransitivePolicyViolationsByOwnerStageComponent
       parameters:
-      - in: path
+      - description: Indicates the scope of the waiver that will be created.
+        in: path
+        name: ownerType
+        required: true
+        schema:
+          enum:
+          - application
+          - organization
+          - repository_container
+          - repository_manager
+          - repository
+          - global
+          pattern: application|organization
+          type: string
+      - description: Enter the corresponding id for the ownerType specified above.
+          E.g. applicationId for ownerType 'application' or organizationId for ownerType
+          'organization'.
+        in: path
+        name: ownerId
+        required: true
+        schema:
+          type: string
+      - description: Enter the stageId corresponding to the evaluation stage at which
+          you want to create a waiver. Possible values are 'develop', 'source', 'build',
+          'stage-release', 'release' and 'operate'.
+        in: path
+        name: stageId
+        required: true
+        schema:
+          type: string
+      - description: Enter the component identifier and coordinates of the component
+          for which you want to waive the transitive violations.
+        in: query
+        name: componentIdentifier
+        schema:
+          $ref: '#/components/schemas/ComponentIdentifier'
+      - description: Enter the package URL of the component for which you want to
+          waive the transitive violations.
+        in: query
+        name: packageUrl
+        schema:
+          type: string
+      - description: 'Enter the hash for the component for which you want to waive
+          the transitive violations '
+        in: query
+        name: hash
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiWaiverOptionsDTO'
+        description: <ol><li>comment (optional, to indicate the reason of the waiver)
+          default value is null</li><li>applyToAllComponents (boolean, default 'false'),deprecated
+          in favor of matcherStrategy. If matcherStrategy is not set, 'true' means
+          this will apply the waiver to all components, 'false' means this will apply
+          to a specific component.</li><li>matcherStrategy (enumeration, required)
+          can have values DEFAULT, EXACT_COMPONENT, ALL_COMPONENTS, ALL_VERSIONS.
+          DEFAULT will match all components if no hash is provided.</li><li>expiryTime
+          (default null) to set the datetime when the waiver expires.</li></ol>
+        required: true
+      responses:
+        '204':
+          description: Waiver created successfully.
+      tags:
+      - Policy Waivers
+  /api/v2/policyWaivers/transitive/{ownerType}/{ownerId}/{scanId}:
+    get:
+      description: 'Use this method to retrieve all waivers on policy violations due
+        to transitive dependencies for a specific component detected in a specific
+        scan. Any one of the input parameters, i.e. componentIdentifier, packageUrl
+        or hash is required. If more than one is provided, the system will pick them
+        in the order specified here.
+
+
+        Permissions required: View IQ Elements'
+      operationId: getTransitivePolicyWaiversByAppScanComponent
+      parameters:
+      - description: Enter the ownerType to specify the scope. The response will contain
+          the policy violations that are within the scope specified.
+        in: path
+        name: ownerType
+        required: true
+        schema:
+          enum:
+          - application
+          - organization
+          - repository_container
+          - repository_manager
+          - repository
+          - global
+          pattern: application
+          type: string
+      - description: Enter the corresponding id for the ownerType specified above.
+        in: path
+        name: ownerId
+        required: true
+        schema:
+          type: string
+      - description: Enter the scanId (reportId) of the scan for which you want to
+          retrieve the waivers on transitive policy violations occurring due the dependencies
+          of a component.
+        in: path
+        name: scanId
+        required: true
+        schema:
+          type: string
+      - description: Enter the component identifier for the component for which you
+          want to retrieve the waivers on transitive policy violations, for the specified
+          scanId.
+        in: query
+        name: componentIdentifier
+        schema:
+          $ref: '#/components/schemas/ComponentIdentifier'
+      - description: Enter the package URL for the component for which you want to
+          retrieve the waivers on transitive policy violations, for the specified
+          scanId.
+        in: query
+        name: packageUrl
+        schema:
+          type: string
+      - description: Enter the hash for the component for which you want to retrieve
+          the waivers on transitive policy violations, for the specified scanId.
+        in: query
+        name: hash
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiComponentPolicyWaiversDTO'
+          description: The response contains a list of waivers on transitive policy
+            violations for the dependencies of the component specified, for the given
+            scanId.
+      tags:
+      - Policy Waivers
+    post:
+      description: 'Use this method to create a policy waiver on a transitive component
+        detected during the specified scan. NOTE: Any one of the input parameters,
+        i.e. component identifier, packageUrl or hash is required. If more than one
+        is provided, the system will pick them in the order specified here.
+
+
+        Permissions required: Waive Policy Violations'
+      operationId: addWaiverToTransitivePolicyViolationsByAppScanComponent
+      parameters:
+      - description: Indicates the scope of the waiver that will be created.
+        in: path
+        name: ownerType
+        required: true
+        schema:
+          enum:
+          - application
+          - organization
+          - repository_container
+          - repository_manager
+          - repository
+          - global
+          pattern: application
+          type: string
+      - description: Enter the corresponding id for the ownerType specified above.
+        in: path
+        name: ownerId
+        required: true
+        schema:
+          type: string
+      - description: Enter the scanId (reportId) of the evaluation report that shows
+          the transitive component.
+        in: path
+        name: scanId
+        required: true
+        schema:
+          type: string
+      - description: Enter the component identifier of the transitive component on
+          which you want to create a policy waiver.
+        in: query
+        name: componentIdentifier
+        schema:
+          $ref: '#/components/schemas/ComponentIdentifier'
+      - description: Enter the package URL of the transitive component on which you
+          want to create a policy waiver.
+        in: query
+        name: packageUrl
+        schema:
+          type: string
+      - description: Enter the hash of the transitive component on which you want
+          to create a policy waiver.
+        in: query
+        name: hash
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiWaiverOptionsDTO'
+        description: The request JSON can include the fields<ol><li>comment (optional,
+          to indicate the reason of the waiver) default value is null</li><li>applyToAllComponents
+          (boolean, default 'false'),deprecated in favor of matcherStrategy. If matcherStrategy
+          is not set, 'true' means this will apply the waiver to all components, 'false'
+          means this will apply to a specific component.</li><li>matcherStrategy (enumeration,
+          required) can have values DEFAULT, EXACT_COMPONENT, ALL_COMPONENTS, ALL_VERSIONS.
+          DEFAULT will match all components if no hash is provided.</li><li>expiryTime
+          (default null) to set the datetime when the waiver expires.</li></ol>
+      responses:
+        '204':
+          description: No content. Indicates that the waiver has been created successfully.
+      tags:
+      - Policy Waivers
+  /api/v2/policyWaivers/waiverRequests/{policyViolationId}:
+    post:
+      description: Use this method to trigger a waiver request webhook event. The
+        'Waiver Request' event type should have been configured as one of the IQ Server
+        webhooks, before using this method.
+      operationId: requestPolicyWaiver
+      parameters:
+      - description: Enter the policyViolationId for which you want to trigger the
+          waiver request event.
+        in: path
+        name: policyViolationId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiRequestPolicyWaiverDTO'
+        description: The request JSON should contain<ol><li>comment (optional, default
+          null) to indicate the waiver request reason</li><li>policyViolationLink
+          (link to the policy violation page in the Lifecycle UI)</li><li>addWaiverLink
+          (link to the Add Waiver page in the Lifecycle UI)</li></ol>
+      responses:
+        '204':
+          description: Waiver request webhook triggered successfully
+      tags:
+      - Policy Waivers
+  /api/v2/policyWaivers/{ownerType}/{ownerId}:
+    get:
+      description: 'Use this method to retrieve waiver details for all policy waivers
+        for the scope specified. You can specify the scope by using the parameters
+        ownerType and ownerId.
+
+
+        Permissions required: View IQ Elements'
+      operationId: getPolicyWaivers
+      parameters:
+      - description: Enter the ownerType to specify the scope. The response will contain
+          waivers that are within the scope specified.
+        in: path
         name: ownerType
         required: true
         schema:
@@ -6674,12 +6983,64 @@ paths:
           - global
           pattern: application|organization|repository|repository_manager|repository_container
           type: string
-      - in: path
+      - description: Enter the corresponding id for the ownerType specified above.
+        in: path
         name: ownerId
         required: true
         schema:
           type: string
-      - in: path
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiPolicyWaiverDTO'
+                type: array
+          description: The response contains waiver details for the specified ownerType
+            and the corresponding ownerId, grouped by the policyWaiverId. The response
+            field 'matcherStrategy' indicates whether the waiver applies to a specific
+            component, or all components that exist at that level of hierarchy (root
+            org, org application), or all versions of the component (past, present,
+            and future). The response fields associatedPackageUrl, displayName, and
+            componentIdentifier are null for waivers on all components and unknown
+            components.
+      tags:
+      - Policy Waivers
+  /api/v2/policyWaivers/{ownerType}/{ownerId}/{policyViolationId}:
+    post:
+      description: 'Use this method to create a policy waiver.
+
+
+        Permissions required: Waive Policy Violations'
+      operationId: addPolicyWaiverByPolicyViolationId
+      parameters:
+      - description: Indicates the scope of the waiver. Possible values are application,
+          organization, repository, repository_manager, repository_container, global.
+        in: path
+        name: ownerType
+        required: true
+        schema:
+          enum:
+          - application
+          - organization
+          - repository_container
+          - repository_manager
+          - repository
+          - global
+          pattern: application|organization|repository|repository_manager|repository_container
+          type: string
+      - description: Enter the id for the ownerType provided above. E.g. applicationId
+          if the ownerType is application.
+        in: path
+        name: ownerId
+        required: true
+        schema:
+          type: string
+      - description: Enter the policyViolationId for the policy on which you want
+          to create a waiver. Use the Policy Violation REST API or Reports REST API
+          to obtain the policyViolationId.
+        in: path
         name: policyViolationId
         required: true
         schema:
@@ -6689,18 +7050,31 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApiWaiverOptionsDTO'
+        description: The request JSON can include the fields<ol><li>comment (optional,
+          to indicate the reason of the waiver) default value is null</li><li>applyToAllComponents
+          (boolean, default 'false'),deprecated in favor of matcherStrategy. If matcherStrategy
+          is not set, 'true' means this will apply the waiver to all components, 'false'
+          means this will apply to a specific component.</li><li>matcherStrategy (enumeration,
+          required) can have values DEFAULT, EXACT_COMPONENT, ALL_COMPONENTS, ALL_VERSIONS.
+          DEFAULT will match all components if no hash is provided.</li><li>expiryTime
+          (default null) to set the datetime when the waiver expires.</li></ol>
+        required: true
       responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
+        '204':
+          description: No content. Indicates that the waiver has been created successfully.
       tags:
       - Policy Waivers
   /api/v2/policyWaivers/{ownerType}/{ownerId}/{policyWaiverId}:
     delete:
+      description: 'Use this method to delete a waiver, specified by the policyWaiverId.
+
+
+        Permissions required: Waive Policy Violations'
       operationId: deletePolicyWaiver
       parameters:
-      - in: path
+      - description: Enter the ownerType to specify the scope. A waiver corresponding
+          to the policyWaiverId provided and within the scope specified will be deleted.
+        in: path
         name: ownerType
         required: true
         schema:
@@ -6713,27 +7087,33 @@ paths:
           - global
           pattern: application|organization|repository|repository_manager|repository_container
           type: string
-      - in: path
+      - description: Enter the corresponding id for the ownerType specified above.
+        in: path
         name: ownerId
         required: true
         schema:
           type: string
-      - in: path
+      - description: Enter the policyWaiverId to be deleted.
+        in: path
         name: policyWaiverId
         required: true
         schema:
           type: string
       responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
+        '204':
+          description: Waiver has been deleted successfully.
       tags:
       - Policy Waivers
     get:
+      description: 'Use this method to retrieve waiver details for the waiverId specified.
+
+
+        Permissions required: View IQ Elements'
       operationId: getPolicyWaiver
       parameters:
-      - in: path
+      - description: Enter the ownerType to specify the scope. The response will contain
+          the details for waivers within the scope.
+        in: path
         name: ownerType
         required: true
         schema:
@@ -6746,117 +7126,212 @@ paths:
           - global
           pattern: application|organization|repository|repository_manager|repository_container
           type: string
-      - in: path
+      - description: Enter the corresponding id for the ownerType specified above.
+        in: path
         name: ownerId
         required: true
         schema:
           type: string
-      - in: path
+      - description: Enter the policyWaiverId for which you want to retrieve the waiver
+          details.
+        in: path
         name: policyWaiverId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiPolicyWaiverDTO'
-          description: default response
+          description: The response contains waiver details corresponding to the policy
+            waiverId specified.
       tags:
       - Policy Waivers
   /api/v2/reports/applications:
     get:
+      description: "Use this method to view all application reports for applications\
+        \ to which  you have access. \n\nPermissions required: View IQ Elements "
       operationId: getAll_1
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/ApiApplicationReportDTOV2'
                 type: array
-          description: default response
+          description: 'The response JSON contains URLs to view the report data in
+            html and pdf format, for each application to which you have access.
+
+
+            The response field stage indicates the stage at which the policy evaluation
+            was executed, such as ''develop'', ''build'' and ''release'' The response
+            field latestReportHtmlUrl is a relative link to view the most recent report.
+            Response fields reportPdfUrl and reportHtmlUrl are links to view the pdf
+            version of the report.The response field reportDataUrl is a link to view
+            the most recent report data. '
       tags:
       - Reports
   /api/v2/reports/applications/{applicationId}:
     get:
+      description: "Use this method to retrieve the application reports for the specified\
+        \ application Id. You can view application reports only for applications to\
+        \ which you have access. \n\nPermissions required: View IQ Elements "
       operationId: getByApplicationId
       parameters:
-      - in: path
+      - description: 'Enter the internal application Id. You can use the Applications
+          REST API to get the internal application Id. '
+        in: path
         name: applicationId
         required: true
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/ApiApplicationReportDTOV2'
                 type: array
-          description: default response
+          description: "The response JSON contains the URLs to access the latest scan\
+            \ report for the applicationId provided. \n\nThe response field `stage`\
+            \ indicates the stage at which the policy evaluation was executed, such\
+            \ as 'develop', 'build', 'release'.  The response field `latestReportHtmlUrl`\
+            \ is a relative link to view the most recent report. Response fields `reportPdfURL`\
+            \ and `reportHtmlURL` are links to view the pdf version of the report.\
+            \ The response field `reportDataUrl` is a link to view the most recent\
+            \ report data. "
       tags:
       - Reports
   /api/v2/reports/applications/{applicationId}/history:
     get:
+      description: "Use this method to retrieve previous application scan reports\
+        \ (100 max.) for the specified application. You can view application reports\
+        \ only for applications to which you have access.  \n\nPermissions required:\
+        \ View IQ Elements "
       operationId: getReportHistoryForApplication
       parameters:
-      - in: path
+      - description: 'Enter the internal application Id. You can use the Applications
+          REST API to get the internal application Id. '
+        in: path
         name: applicationId
         required: true
         schema:
           type: string
-      - in: query
+      - description: 'Enter the specific stage, for which you want retrieve the scan
+          history, e.g. ''build'' '
+        in: query
         name: stage
         schema:
           type: string
-      - in: query
+      - description: Enter the exact no. of most recent reports to retrieve.
+        in: query
         name: limit
         schema:
           format: int32
           type: integer
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiReportHistoryDTO'
-          description: default response
+          description: "The response contains evaluation details, embeddable link\
+            \ and URLs to view the reports in pdf and html formats. \n\n<ul><li><code>stage</code>\
+            \ indicates the stage at which policy evaluation was performed, such as\
+            \ 'develop', 'build' and 'release'.</li><li><code>latestReportHtmlUrl</code>\
+            \ is a relative link to view the most recent evaluation report.</li><li><code>reportPdfUrl</code>\
+            \ and <code>reportHtmlUrl</code> are links to view the pdf version of\
+            \ the report.</li><li><code>reportDataUrl</code> is a link to view the\
+            \ most recent report data.</li><li><code>scanId</code> is the Id associated\
+            \ with the evaluation report.</li><li><code>isReevaluation</code> indicates\
+            \ whether this policy evaluation is a re-evaluation of an older policy\
+            \ evaluation.</li><li><code>isForMonitoring</code> indicates whether this\
+            \ policy evaluation was triggered by continuous monitoring.</li><li><code>commitHash</code>\
+            \ is the hash string that identifies a specific commit in the source control\
+            \ system.</li><li><code>scanTriggerType</code> indicates the type of scan\
+            \ used for this evaluation, such as WEB_UI.</li><li><code>affectedComponentCount</code>\
+            \ is the number of components identified in this evaluation.</li><li><code>criticalComponentCount</code>,\
+            \ <code>severeComponentCount</code>, <code>moderateComponentCount</code>\
+            \ indicate the number of components with critical, severe and moderate\
+            \ policy violations respectively.</li><li><code>criticalPolicyViolationCount</code>,\
+            \ <code>severePolicyViolationCount</code>, <code>moderatePolicyViolationCount</code>\
+            \ indicate the number of critical, severe and moderate policy violations\
+            \ respectively.</li><li><code>policyEvaluationResult</code> contains details\
+            \ on the policy violation such as, coordinates of the violating component\
+            \ and the specific policy constraints that are violated.</li></ul>"
+        '400':
+          description: Error in request. Check for missing or invalid parameter.
+        '404':
+          description: Scan report history could not be found.
       tags:
       - Reports
   /api/v2/reports/components/quarantined:
     get:
+      description: "Use this method to retrieve all repository components that are\
+        \ quarantined. The response contains violation details and the quarantine\
+        \ Id of the component. Use the quarantine Id,  to release the component from\
+        \ quarantine, using the Release from Quarantine REST API. \n\nPermissions\
+        \ required: View IQ Elements and access to the specific repository."
       operationId: getComponentsInQuarantine
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiComponentsInQuarantineDTO'
-          description: default response
+          description: 'The JSON response returns the component details and policy
+            violation details that are triggering the quarantine. If a quarantined
+            component does not show any policy violation, it implies that the policy
+            violations have been waived, but the component has not been released from
+            quarantine. '
       tags:
       - Reports
   /api/v2/reports/components/waivers:
     get:
+      description: 'Use this method to retrieve existing policy waivers by components.
+        For an up-to-date response, ensure that all application and repository reports
+        are current and contain the most recent re-evaluation data.<p>You can specify
+        the format/ecosystem of the component for a filtered result. <p>Permissions
+        required: View IQ Elements and access to the specific applications and repositories '
       operationId: getComponentsWithWaivers
       parameters:
-      - in: query
+      - description: Enter the format/ecosystem of the component
+        in: query
         name: format
         schema:
           type: string
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiComponentWaiversDTO'
-          description: default response
+          description: The JSON response contains waivers grouped by application components
+            and repository components. Waived violations for application components
+            are listed per stage. Waived violations for repository components are
+            listed in the Proxy stage. <p>The component hash is null if the waiver
+            applies to all components or all versions of a component. It is truncated
+            and meant to be used as an identifier to other REST API calls and not
+            for use as checksum. <p>`isObsolete` indicates if a waived violation does
+            not have a valid waiver information. This could happen when a waiver has
+            been removed and the report has not been re-evaluated.<p>`matcherStrategy`
+            can have values EXACT_COMPONENT, ALL_COMPONENTS, ALL_VERSIONS. <p>The
+            response fields `associatedPackageUrl`, `componentIdentifier` and `displayName`
+            are returned only if the waiver is of type ALL_VERSIONS OR EXACT_COMPONENTS
+            and the component is not an unknown component .
       tags:
       - Reports
   /api/v2/reports/metrics:
     post:
+      description: 'Use this method to retrieve metrics data such as policy evaluation
+        metrics, violation and remediation metrics aggregated monthly or weekly.
+
+
+        Permissions required: View IQ Elements'
       operationId: getMetrics
       requestBody:
         content:
@@ -6864,22 +7339,37 @@ paths:
             schema:
               $ref: '#/components/schemas/ApiMetricsReportingQueryDTOV2'
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+            text/csv: {}
+          description: Select the media type JSON or csv for the preferred output
+            format.
       tags:
       - Reports
   /api/v2/reports/waivers/stale:
     get:
+      description: "Stale waivers pose a risk because they could be applied unintentionally.\
+        \ Use this method to retrieve stale waivers to eliminate this risk for future\
+        \ application evaluations. \n\nPermissions required: View IQ Elements. You\
+        \ can view stale waivers only for applications/repositories  to which you\
+        \ have access. "
       operationId: getStaleWaivers
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiStaleWaiversResponseDTO'
-          description: default response
+          description: 'The response contains waiverId of the stale waiver, policyId
+            and policyName of the policy being waived, comment, waiver scope, time
+            created, expiry time and the waiver creator details. The response field
+            staleEvaluations contains a list of applications or repositories that
+            have not been evaluated since the waiver was created. '
+        '409':
+          description: Found waivers for applications/repositories that have not been
+            evaluated since IQ Server version 76. Re-evaluating the repository is
+            recommended.
       tags:
       - Reports
   /api/v2/repositories/quarantine/{quarantineId}/release:
@@ -7319,12 +7809,12 @@ paths:
         schema:
           default: current
           type: string
-      - description: Target specification of the sbom. Allowed values [cyclonedx1.5|spdx2.3].
-          default = cyclonedx1.5
+      - description: Target specification of the sbom. Allowed values [cyclonedx1.6|cyclonedx1.5|spdx2.3].
+          default = cyclonedx1.6
         in: query
         name: specification
         schema:
-          default: cyclonedx1.5
+          default: cyclonedx1.6
           type: string
       - description: Output format(json/xml) of the sbom. Changing the output format
           only applicable when downloading the current form of the SBOM. The original
@@ -7391,6 +7881,11 @@ paths:
             type: string
           type: array
           uniqueItems: true
+      - description: If provided, filter components by the component name
+        in: query
+        name: componentName
+        schema:
+          type: string
       - description: Criteria to sort the results. default = VULNERABILITIES
         in: query
         name: sortBy
@@ -7430,6 +7925,43 @@ paths:
       tags:
       - sbom
   /api/v2/sbom/applications/{applicationId}/versions/{version}/vulnerability/{refId}/analysis:
+    delete:
+      description: Deletes a Vulnerability analysis for a given component.
+      operationId: deleteVulnerabilityAnalysis
+      parameters:
+      - description: The internal id of the application
+        in: path
+        name: applicationId
+        required: true
+        schema:
+          type: string
+      - description: The version for a specific SBOM where the vulnerability is present
+        in: path
+        name: version
+        required: true
+        schema:
+          type: string
+      - description: The vulnerability id of a vulnerability
+        in: path
+        name: refId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/componentLocator'
+        description: Hash or packageUrl to identify the component
+        required: true
+      responses:
+        '204':
+          description: Vulnerability analysis deleted
+        '404':
+          description: Vulnerability analysis not found
+      summary: Deletes a Vulnerability analysis for a given component.
+      tags:
+      - sbom
     put:
       description: Updates a vulnerability analysis annotation for a specific SBOM
         vulnerability
@@ -7470,44 +8002,6 @@ paths:
       summary: Updates a vulnerability analysis annotation for a specific SBOM vulnerability
       tags:
       - sbom
-  /api/v2/sbom/dashboard/sbomsAnalyzed:
-    get:
-      description: Queries how many SBOMs have been analyzed and the threshold in
-        the product license
-      operationId: getSbomsAnalyzedMetrics
-      responses:
-        '200':
-          content:
-            application/json: {}
-          description: Total of SBOMs analyzed and the threshold in the product license
-      summary: Gets total of SBOMs analyzed and the threshold in the product license
-      tags:
-      - sbom dashboard
-  /api/v2/sbom/dashboard/sbomsHistoryMetrics:
-    get:
-      description: Queries how many SBOMs applications have been analyzed
-      operationId: getApplicationsHistoryMetric
-      responses:
-        '200':
-          content:
-            application/json: {}
-          description: Total of SBOMs applications analyzed
-      summary: Gets application history metrics
-      tags:
-      - sbom dashboard
-  /api/v2/sbom/dashboard/vulnerabilitiesByThreatLevel:
-    get:
-      description: Queries how many vulnerabilities and annotations have been found
-        by each threat level
-      operationId: getVulnerabilitiesByThreatLevel
-      responses:
-        '200':
-          content:
-            application/json: {}
-          description: Counters of vulnerabilities and annotations by threat level
-      summary: Gets counters of vulnerabilities and annotations by threat level
-      tags:
-      - sbom dashboard
   /api/v2/sbom/import:
     post:
       description: Imports a new sbom version to an existing application
@@ -7689,6 +8183,19 @@ paths:
         required: true
         schema:
           type: string
+      - description: Enter the no. of results that should be visible per page, unset
+          gives all results
+        in: query
+        name: pageSize
+        schema:
+          format: int32
+          type: integer
+      - description: Enter the page no. for the page containing results
+        in: query
+        name: page
+        schema:
+          format: int32
+          type: integer
       - description: Set to `true` to retrieve results that include components with
           no violations.
         in: query
@@ -7777,6 +8284,47 @@ paths:
           description: default response
       tags:
       - Security Overrides
+  /api/v2/solutions/licensed:
+    get:
+      operationId: getLicensedSolutions
+      parameters:
+      - in: query
+        name: allowRelativeUrls
+        schema:
+          default: false
+          type: boolean
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiLicensedSolutionDTO'
+                type: array
+          description: default response
+      tags:
+      - Solutions
+  /api/v2/sourceControl/automaticRoleAssignment/{publicId}:
+    post:
+      operationId: automaticRoleAssignment
+      parameters:
+      - in: path
+        name: publicId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+                uniqueItems: true
+          description: default response
+      tags:
+      - Source Control
   /api/v2/sourceControl/{ownerType}/{internalOwnerId}:
     delete:
       operationId: deleteSourceControl
@@ -8026,7 +8574,7 @@ paths:
           application/json:
             schema:
               additionalProperties:
-                type: string
+                type: object
               type: object
       responses:
         default:
@@ -8293,6 +8841,9 @@ tags:
 - description: Use the Advanced Search REST API to perform searches on Lifecycle application
     scan reports.
   name: Advanced Search
+- description: 'Use the Application Categories REST API to manage the application
+    categories or tags assigned to the applications in an organization. '
+  name: Application Categories
 - description: Use this REST API to retrieve a component's security vulnerability
     data, license data, age and popularity.
   name: Components
@@ -8308,7 +8859,24 @@ tags:
     \ \n1. Requesting a policy evaluation (POST) \n2. Checking the status and response\
     \ of the evaluation request (GET)"
   name: Policy Evaluation
-- name: Application Categories
+- description: 'Use this REST API to obtain the violation details, violation details
+    across stages (cross stage), violations occurring due to transitive dependencies
+    and all waivers applicable to a violation.
+
+
+    Cross-stage policy violations are helpful in performance analysis like MTTR metrics.'
+  name: Policy Violation Details
+- description: Use this rest API to manage and fetch available waiver reasons
+  name: Policy Waiver Reasons
+- description: Use this REST API to create and retrieve policy waivers.
+  name: Policy Waivers
+- description: Use this REST API to retrieve the data from an application composition
+    report, that is generated after an evaluation.
+  name: Application Report Data
+- description: 'Use this REST API to view application scan reports, generate a list
+    of stale waivers, view existing policy waivers on components, view quarantined
+    components and retrieve additional metrics data. '
+  name: Reports
 - name: Applications
 - name: Audit Logs
 - name: Claim
@@ -8329,17 +8897,14 @@ tags:
 - name: License Legal Metadata
 - name: Organizations
 - name: Policies
-- name: Policy Violations
-- name: Policy Waiver
-- name: Policy Waivers
 - name: Product
-- name: Reports
 - name: Repositories
 - name: Role Memberships
 - name: Roles
 - name: Scan
 - name: Search
 - name: Security Overrides
+- name: Solutions
 - name: Source Control
 - name: Source Control Metrics
 - name: Spdx
@@ -8348,4 +8913,3 @@ tags:
 - name: Users
 - name: Vulnerabilities
 - name: sbom
-- name: sbom dashboard
