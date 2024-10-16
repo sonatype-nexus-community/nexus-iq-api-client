@@ -92,11 +92,15 @@ jobs:
             - name: Install dependencies
               run: poetry install --no-root
               working-directory: out/python
+
             - name: Ensure build successful
               run: poetry build
               working-directory: out/python
+
             - name: Run Tests
-              run: pytest
+              run: |
+                  pip install -r test-requirements.txt
+                  pytest
               working-directory: out/python
 
     validate-typescript:
