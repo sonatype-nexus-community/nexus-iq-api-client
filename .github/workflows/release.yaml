@@ -125,6 +125,7 @@ jobs:
 
             - name: Publish
               run: |
+                  poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
                   poetry publish
               working-directory: out/python
 
