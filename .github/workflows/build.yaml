@@ -100,7 +100,7 @@ jobs:
             - name: Run Tests
               run: |
                   pip install -r test-requirements.txt
-                  pytest
+                  poetry run pytest
               working-directory: out/python
 
     validate-typescript:
